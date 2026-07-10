@@ -1013,7 +1013,7 @@ preset_keyboards:
       - {click: ',', long_click: '<'}
       - {click: '.', long_click: '>'}
       - {click: '/', long_click: '?'}
-      - {click: Shift_L}
+      - {click: Shift_L, long_click: Keyboard_ninekey}
       - {click: Keyboard_symbols, long_click: Keyboard_number}
       - {click: Mode_switch, long_click: Menu, swipe_down: Keyboard_ninekey}
       - {click: space, width: 30}
@@ -1192,7 +1192,7 @@ preset_keyboards:
     - {click: 'k', long_click: ':'}
     - {click: 'l', long_click: ';'}
     - {width: 5}
-    - {click: Shift_L, send_bindings: false, width: 15}
+    - {click: Shift_L, long_click: Keyboard_ninekey, send_bindings: false, width: 15}
     - {click: 'z', long_click: '`'}
     - {click: 'x', long_click: cut}
     - {click: 'c', long_click: copy}
