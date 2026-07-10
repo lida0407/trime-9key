@@ -911,6 +911,8 @@ preset_keys:
   #切换键盘
   Keyboard_symbols: {label: 符號, send: Eisu_toggle, select: symbols}
   Keyboard_number: {label: 數字, send: Eisu_toggle, select: number}
+  Keyboard_ninekey: {label: 九宮格, send: Eisu_toggle, select: nine_key}
+  Keyboard_qwerty: {label: 字母, send: Eisu_toggle, select: qwerty}
   Keyboard_mini: {label: 迷你, send: Eisu_toggle, select: mini}
   Keyboard_letter: {label: 字母, send: Eisu_toggle, select: default}
   Keyboard_default: {label: 返回, send: Eisu_toggle, select: .default}
@@ -1013,7 +1015,7 @@ preset_keyboards:
       - {click: '/', long_click: '?'}
       - {click: Shift_L}
       - {click: Keyboard_symbols, long_click: Keyboard_number}
-      - {click: Mode_switch, long_click: Menu}
+      - {click: Mode_switch, long_click: Menu, swipe_down: Keyboard_ninekey}
       - {click: space, width: 30}
       - {click: "'", long_click: '"'}
       - {click: BackSpace, width: 15}
@@ -1199,13 +1201,38 @@ preset_keyboards:
     - {click: 'n', long_click: '"'}
     - {click: 'm', long_click: "'"}
     - {click: BackSpace, swipe_left: Escape, width: 15}
-    - {click: Mode_switch, long_click: Menu, width: 15}
+    - {click: Mode_switch, long_click: Menu, width: 15, swipe_down: Keyboard_ninekey}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
     - {click: space, width: 30}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
+  nine_key:
+    name: 九宮格
+    author: "trime-9key"
+    ascii_mode: 0
+    columns: 3 #每行3鍵，超過則自動換行
+    width: 33.33
+    height: 55
+    lock: true #切換程序時記憶鍵盤
+    keys:
+    - {click: Shift_L, send_bindings: false}
+    - {click: Mode_switch, long_click: Menu}
+    - {click: Keyboard_symbols, long_click: Keyboard_number}
+    - {label: '1', hint: ',.!?', click: '.', long_click: '!', swipe_left: ',', swipe_right: '?', popup: ['.', ',', '?', '!']}
+    - {label: ABC, hint: '2', click: a, swipe_left: b, swipe_right: c, popup: [a, b, c]}
+    - {label: DEF, hint: '3', click: d, swipe_left: e, swipe_right: f, popup: [d, e, f]}
+    - {label: GHI, hint: '4', click: g, swipe_left: h, swipe_right: i, popup: [g, h, i]}
+    - {label: JKL, hint: '5', click: j, swipe_left: k, swipe_right: l, popup: [j, k, l]}
+    - {label: MNO, hint: '6', click: m, swipe_left: n, swipe_right: o, popup: [m, n, o]}
+    - {label: PQRS, hint: '7', click: p, swipe_left: q, swipe_right: r, swipe_up: s, popup: [p, q, r, s]}
+    - {label: TUV, hint: '8', click: t, swipe_left: u, swipe_right: v, popup: [t, u, v]}
+    - {label: WXYZ, hint: '9', click: w, swipe_left: x, swipe_right: y, swipe_up: z, popup: [w, x, y, z]}
+    - {click: Keyboard_qwerty, label: 字母}
+    - {click: space, label: 空格, hint: '0'}
+    - {click: BackSpace, long_click: Escape}
+    - {click: Return, composing: Return1, long_click: CommitComment, width: 100}
   us_intl:
     name: 美式國際
     author: "Terry Tsang <archerindigo@gmail.com>"
