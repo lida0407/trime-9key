@@ -485,6 +485,12 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
 
     override fun onCreateInputView(): View? {
         Timber.d("onCreateInputView")
+        if (!ThemeManager.isInitialized) {
+            // Rime/theme hasn't finished starting yet (e.g. storage permission not granted
+            // yet); bail out instead of crashing. onThemeChangeListener will build the view
+            // once ThemeManager.init() completes.
+            return null
+        }
         replaceInputViews(ThemeManager.activeTheme)
         // We will call `setInputView` by ourselves. This is fine.
         return null
