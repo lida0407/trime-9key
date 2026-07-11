@@ -16,6 +16,17 @@
     <string name="librime_version">RIME 版本</string>
     <string name="opencc_version">OpenCC 版本</string>
     <string name="current_version">當前版本</string>
+    <!-- trime-9key 自動更新 -->
+    <string name="update__check">檢查更新</string>
+    <string name="update__check_summary">檢查是否有新的 trime-9key 版本</string>
+    <string name="update__available_title">發現新版本</string>
+    <string name="update__available_message">新版本：%1$s\n\n%2$s</string>
+    <string name="update__already_latest">已是最新版本</string>
+    <string name="update__check_failed">檢查更新失敗</string>
+    <string name="update__download">下載並安裝</string>
+    <string name="update__open_browser">用瀏覽器打開</string>
+    <string name="update__downloading">正在下載更新…</string>
+    <string name="update__download_failed">下載失敗</string>
     <string name="license">許可證</string>
     <string name="privacy_policy">隱私權政策</string>
     <string name="build_info_format">建構者：%1$s\n建構 Git 雜湊值：%2$s\n建構時間：%3$s</string>

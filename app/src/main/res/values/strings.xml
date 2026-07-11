@@ -16,6 +16,17 @@
     <string name="librime_version">RIME version</string>
     <string name="opencc_version">OpenCC version</string>
     <string name="current_version">Current version</string>
+    <!-- trime-9key self-update -->
+    <string name="update__check">Check for updates</string>
+    <string name="update__check_summary">Look for a newer trime-9key build</string>
+    <string name="update__available_title">Update available</string>
+    <string name="update__available_message">New version: %1$s\n\n%2$s</string>
+    <string name="update__already_latest">You are on the latest build</string>
+    <string name="update__check_failed">Update check failed</string>
+    <string name="update__download">Download &amp; install</string>
+    <string name="update__open_browser">Open in browser</string>
+    <string name="update__downloading">Downloading update…</string>
+    <string name="update__download_failed">Download failed</string>
     <string name="license">License</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="build_info_format">Builder: %1$s\nBuild Git Hash: %2$s\nBuild Time: %3$s</string>

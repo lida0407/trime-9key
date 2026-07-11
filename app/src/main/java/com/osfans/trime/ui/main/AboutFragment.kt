@@ -17,6 +17,7 @@ import com.osfans.trime.ui.common.PaddingPreferenceFragment
 import com.osfans.trime.util.Const
 import com.osfans.trime.util.addCategory
 import com.osfans.trime.util.addPreference
+import com.osfans.trime.util.checkForUpdate
 import com.osfans.trime.util.formatDateTime
 
 class AboutFragment : PaddingPreferenceFragment() {
@@ -34,6 +35,9 @@ class AboutFragment : PaddingPreferenceFragment() {
                         Uri.parse("${BuildConfig.BUILD_GIT_REPO}/commit/${BuildConfig.BUILD_COMMIT_HASH}"),
                     ),
                 )
+            }
+            addPreference(R.string.update__check, R.string.update__check_summary) {
+                requireActivity().checkForUpdate(silent = false)
             }
             addPreference(R.string.librime_version, BuildConfig.LIBRIME_VERSION) {
                 val hash = getCommitFromVersionName(BuildConfig.LIBRIME_VERSION)
