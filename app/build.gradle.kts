@@ -208,3 +208,14 @@ configurations {
         exclude(group = "androidx.profileinstaller", module = "profileinstaller")
     }
 }
+
+// trime-9key: custom Rime data (e.g. rime-ice emoji opencc map) that must land
+// in the build-managed, git-ignored assets/shared/opencc directory. Kept under
+// the tracked app/rime-data/ and copied in after installOpenCCData (so it isn't
+// wiped by cleanOpenCCData) and before generateDataChecksums (so it's bundled).
+val copyCustomRimeData by tasks.registering(Copy::class) {
+    from(layout.projectDirectory.dir("rime-data/opencc"))
+    into(layout.projectDirectory.dir("src/main/assets/shared/opencc"))
+    mustRunAfter("installOpenCCData")
+}
+tasks.named("generateDataChecksums").configure { dependsOn(copyCustomRimeData) }
