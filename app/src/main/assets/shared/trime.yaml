@@ -1223,10 +1223,11 @@ preset_keyboards:
     height: 55
     lock: true #切換程序時記憶鍵盤
     keys:
-    - {click: Shift_L, send_bindings: false}
-    - {click: Mode_switch, long_click: Menu}
-    - {click: Keyboard_symbols, long_click: Keyboard_number}
-    - {label: '1', hint: ',.!?', click: '.', long_click: '!', swipe_left: ',', swipe_right: '?', popup: ['.', ',', '?', '!']}
+    # 頂行：左上 句號/數字/符號（click句號，長按符號鍵盤，上滑數字鍵盤），
+    # 中間空白，右上 退格。
+    - {label: '.', hint: 符, click: '.', long_click: Keyboard_symbols, swipe_up: Keyboard_number}
+    - {width: 33.33}
+    - {click: BackSpace, long_click: Escape}
     - {label: ABC, click: '2'}
     - {label: DEF, click: '3'}
     - {label: GHI, click: '4'}
@@ -1235,10 +1236,10 @@ preset_keyboards:
     - {label: PQRS, click: '7'}
     - {label: TUV, click: '8'}
     - {label: WXYZ, click: '9'}
-    - {click: switch_to_qwerty, label: 全键, long_click: Menu}
     - {click: space, label: 空格, hint: '0'}
-    - {click: BackSpace, long_click: Escape}
-    - {click: Return, composing: Return1, long_click: CommitComment, width: 100}
+    # 底行：左下 全鍵（大按鍵，佔兩格），右下 回車。
+    - {click: switch_to_qwerty, label: 全键, width: 66.66}
+    - {click: Return, composing: Return1, long_click: CommitComment}
   us_intl:
     name: 美式國際
     author: "Terry Tsang <archerindigo@gmail.com>"
