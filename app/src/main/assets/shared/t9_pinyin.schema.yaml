@@ -1,0 +1,45 @@
+# Rime schema
+# encoding: utf-8
+#
+# 拼音九宮格 (T9): built on top of 朙月拼音 (luna_pinyin) and its existing
+# dictionary/word-frequency data. The keyboard sends plain digits 2-9
+# (phone-keypad letter groups); which of the 3-4 letters on a key was
+# "meant" is never specified by the user — it's resolved the same way
+# every 九宮格 IME does it: the speller derives every possible digit
+# encoding for each dictionary entry's pinyin spelling, and candidates
+# are ranked by the entry's existing frequency data (詞庫), exactly like
+# normal pinyin input. No new dictionary is needed, only extra spelling
+# variants over the current one.
+#
+# Digit mapping (standard phone keypad):
+#   2=abc 3=def 4=ghi 5=jkl 6=mno 7=pqrs 8=tuv 9=wxyz
+
+__include: luna_pinyin.schema.yaml:/
+
+schema:
+  schema_id: t9_pinyin
+  name: 拼音九宮格
+  version: '0.1'
+  author:
+    - trime-9key
+  description: |
+    朙月拼音的九宮格（T9）變體：鍵盤只發送數字 2-9，候選由詞庫詞頻決定。
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcba9876543210
+  delimiter: " '"
+  algebra:
+    __patch:
+      - pinyin:/abbreviation
+      - pinyin:/spelling_correction
+      - pinyin:/key_correction
+      # 九宮格數字映射：必須放在其餘規則之後，這樣其餘規則新生成的字母
+      # （如 iu -> iou）也能被正確映射到數字。
+      - derive/[abc]/2/
+      - derive/[def]/3/
+      - derive/[ghi]/4/
+      - derive/[jkl]/5/
+      - derive/[mno]/6/
+      - derive/[pqrs]/7/
+      - derive/[tuv]/8/
+      - derive/[wxyz]/9/

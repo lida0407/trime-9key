@@ -1,0 +1,9 @@
+# Rime customization
+# encoding: utf-8
+#
+# Registers the trime-9key T9 (拼音九宮格) schema without touching the
+# bundled default.yaml (which is a symlink into the prelude submodule).
+
+patch:
+  "schema_list/+":
+    - schema: t9_pinyin
