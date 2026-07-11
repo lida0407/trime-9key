@@ -15,7 +15,10 @@ Rime IME for Android — a fork of [osfans/trime](https://github.com/osfans/trim
   resolved by the dictionary's word-frequency (词库), the way every real 九宫格 IME works.
   Implemented purely as a Rime schema ([`t9_pinyin.schema.yaml`](app/src/main/assets/shared/t9_pinyin.schema.yaml))
   built on top of 朙月拼音 (luna_pinyin), reusing its existing dictionary — no new word list needed.
-  After deploying, pick **拼音九宫格** in the schema list.
+- **One-tap 9-key ⇄ qwerty switch** — from the full keyboard, **long-press `Shift`**
+  (or swipe up on the `中/西` key) to jump to the 9-key grid; the **`全键`** key on the
+  grid switches back. Under the hood the switch just changes the Rime schema
+  (`t9_pinyin` ⇄ `luna_pinyin`) and the keyboard layout follows automatically.
 - **Self-update** — the app checks [`dist/latest.json`](dist/latest.json) on launch (and via
   *About → Check for updates*) and offers to download & install a newer build by itself.
 
