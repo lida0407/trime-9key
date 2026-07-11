@@ -1,0 +1,31 @@
+# Rime dictionary
+# encoding: utf-8
+#
+# SPDX-FileCopyrightText: 2026 iDvel and rime-ice contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Combined dictionary for the t9_pinyin (拼音九宫格) schema, built from the
+# curated core of 雾凇拼音 (rime-ice, https://github.com/iDvel/rime-ice):
+#   cn_dicts/8105   — 《通用规范汉字表》character table (single-char coverage)
+#   cn_dicts/base   — curated everyday word list
+#   cn_dicts/ext    — extended vocabulary (成语, less common words)
+#   cn_dicts/others — misc entries
+# Deliberately excludes rime-ice's optional cn_dicts/tencent.dict.yaml
+# (~17MB Tencent word-vector corpus) and cn_dicts/41448 (big char table) to
+# keep APK size and deploy time reasonable; the four tables above are
+# rime-ice's own recommended "everyday" set.
+#
+# This matters specifically for T9: word-frequency in this dictionary is
+# exactly what resolves which letter a digit "meant", so a bigger, better
+# curated dictionary directly improves 9-key candidate accuracy.
+
+---
+name: t9_dict
+version: "2026-07-11"
+sort: by_weight
+import_tables:
+  - cn_dicts/8105
+  - cn_dicts/base
+  - cn_dicts/ext
+  - cn_dicts/others
+...

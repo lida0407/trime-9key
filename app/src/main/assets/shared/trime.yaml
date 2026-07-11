@@ -1222,12 +1222,15 @@ preset_keyboards:
     width: 33.33
     height: 55
     lock: true #切換程序時記憶鍵盤
+    # 完全照搬 Google 拼音（Gboard）九宮格的經典 4x3 佈局：
+    #   1(,.?)  2ABC  3DEF
+    #   4GHI    5JKL  6MNO
+    #   7PQRS   8TUV  9WXYZ
+    #   Shift   0空格  退格
+    # Gboard 不需要處理「切回全鍵盤」和「回車」，這裡用手勢掛在既有鍵位上，
+    # 不额外加鍵、不破壞這個佈局的外觀：長按 Shift 切回全鍵盤；空格上滑回車。
     keys:
-    # 頂行：左上 句號/數字/符號（click句號，長按符號鍵盤，上滑數字鍵盤），
-    # 中間空白，右上 退格。
-    - {label: '.', hint: 符, click: '.', long_click: Keyboard_symbols, swipe_up: Keyboard_number}
-    - {width: 33.33}
-    - {click: BackSpace, long_click: Escape}
+    - {label: '1', hint: ',.!?', click: '.', long_click: '!', swipe_left: ',', swipe_right: '?', popup: ['.', ',', '?', '!']}
     - {label: ABC, click: '2'}
     - {label: DEF, click: '3'}
     - {label: GHI, click: '4'}
@@ -1236,10 +1239,9 @@ preset_keyboards:
     - {label: PQRS, click: '7'}
     - {label: TUV, click: '8'}
     - {label: WXYZ, click: '9'}
-    - {click: space, label: 空格, hint: '0'}
-    # 底行：左下 全鍵（大按鍵，佔兩格），右下 回車。
-    - {click: switch_to_qwerty, label: 全键, width: 66.66}
-    - {click: Return, composing: Return1, long_click: CommitComment}
+    - {click: Shift_L, long_click: switch_to_qwerty, send_bindings: false}
+    - {click: space, label: 空格, hint: '0', swipe_up: Return}
+    - {click: BackSpace, long_click: Escape}
   us_intl:
     name: 美式國際
     author: "Terry Tsang <archerindigo@gmail.com>"

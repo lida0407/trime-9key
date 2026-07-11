@@ -10,16 +10,19 @@
 # 候选带完整带调拼音提示（translator/spelling_hints），所以虽然编码区
 # 显示的是数字，候选项上仍能看到对应的拼音。
 #
-# 词库直接复用朙月拼音（luna_pinyin.dict.yaml），无需新造词库。
+# 词库：t9_dict（见 t9_dict.dict.yaml），取自雾凇拼音（rime-ice）的字表 +
+# 基础词库 + 扩展词库 + 杂项，比朙月拼音自带的词库大得多、更新更勤——
+# T9 的候选质量完全取决于词频，词库越好，猜得越准。
 
 schema:
   schema_id: t9_pinyin
   name: 拼音九宫格
-  version: "0.2"
+  version: "0.3"
   author:
     - trime-9key
   description: |
-    朙月拼音的九宫格（T9）变体：键盘发送数字 2-9，候选由词库词频决定。
+    九宫格（T9）：键盘发送数字 2-9，候选由词库词频决定。
+    词库来自雾凇拼音 (rime-ice) 的字表+基础+扩展+杂项词库。
   dependencies:
     - stroke
 
@@ -82,7 +85,7 @@ speller:
     - xlit/abcdefghijklmnopqrstuvwxyz/22233344455566677778889999/
 
 translator:
-  dictionary: luna_pinyin       # 复用朙月拼音词库
+  dictionary: t9_dict            # 雾凇拼音(rime-ice)词库核心集，见 t9_dict.dict.yaml
   prism: t9_pinyin              # 单独编译数字编码的 prism
   spelling_hints: 16            # 候选标注完整带调拼音（九宫格的拼音提示）
   enable_sentence: true
