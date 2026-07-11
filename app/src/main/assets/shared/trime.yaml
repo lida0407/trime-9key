@@ -1236,7 +1236,7 @@ preset_keyboards:
     - {label: GHI, click: '4'}
     - {label: JKL, click: '5'}
     - {label: MNO, click: '6'}
-    - {label: 分词, click: "'"}
+    - {click: liquid_keyboard_emoji, label: 😀, long_click: "'"}
     - {label: PQRS, click: '7'}
     - {label: TUV, click: '8'}
     - {label: WXYZ, click: '9'}

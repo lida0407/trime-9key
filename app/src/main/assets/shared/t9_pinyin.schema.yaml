@@ -36,6 +36,9 @@ switches:
     states: [ 漢字, 汉字 ]
   - name: ascii_punct
     states: [ 。，, ．， ]
+  - name: emoji            # 输入词语时附带 emoji 候选（如 哈哈 → 😄）
+    states: [ 无表情, 表情 ]
+    reset: 1
 
 engine:
   processors:
@@ -58,8 +61,10 @@ engine:
     - reverse_lookup_translator
     - script_translator
   filters:
+    - simplifier@emoji     # 词语 → emoji 候选（雾凇 rime-ice 的 opencc/emoji.txt）
     - simplifier
     - uniquifier
+    - lua_filter@*t9_preedit  # 编码区显示拼音而不是数字（见 lua/t9_preedit.lua）
 
 speller:
   # 键盘发送的是数字 2-9，它们必须在 alphabet 里，speller 才会把它们当作
@@ -89,6 +94,14 @@ translator:
   prism: t9_pinyin              # 单独编译数字编码的 prism
   spelling_hints: 16            # 候选标注完整带调拼音（九宫格的拼音提示）
   enable_sentence: true
+  # 编码区不显示数字「64」，改显示拼音——由 lua/t9_preedit.lua 把每个候选的
+  # preedit 覆盖成它的拼音（来自 spelling_hints 的 comment）。
+
+# 词语 → emoji：复用雾凇拼音(rime-ice)的 opencc/emoji.txt 映射表
+emoji:
+  option_name: emoji
+  opencc_config: emoji.json
+  inherit_comment: false
 
 reverse_lookup:
   dictionary: stroke
