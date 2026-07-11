@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-22-gd1b71b10",
-  "commit": "d1b71b10ba6746ba927ee7ddc10b4efc4892cebc",
+  "versionName": "v3.3.11-24-g8bf66f25",
+  "commit": "8bf66f257b6e151671a7023becefc72833f5a36c",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "九宫格布局重排：更少一行，四角功能键，全键按钮加大。\n\n· 去掉 Shift、中/西切换、独立的「1」符号键。\n· 左上：句号/数字/符号（点=句号，长按=符号盘，上滑=数字盘）；右上：退格。\n· 左下：全键（切回全键盘，按钮加宽一倍，更好按）；右下：回车。\n· 数字 2-9 顺序不变，空格放在传统「0」的位置。\n· 振动反馈其实已经有了：设置 → 键盘 → 「按键时振动」开关 + 「按键振动时长」滑条（数值越大振动越长）。\n\n9-key layout redesign: one fewer row, corner-placed controls (period/symbol/number top-left, backspace top-right, wide 全键 bottom-left, Enter bottom-right). Key-press vibration + adjustable duration already exist under Settings → Keyboard — just needs turning on."
+  "notes": "九宫格改成 Gboard 经典布局 + 换了更大的词库。\n\n· 布局完全照搬 Google 拼音九宫格：1(,.?) 2ABC 3DEF / 4GHI 5JKL 6MNO / 7PQRS 8TUV 9WXYZ / Shift 0(空格) 退格。长按 Shift 切回全键盘，空格上滑是回车。\n· 词库换成雾凇拼音(rime-ice)的字表+基础+扩展+杂项词库（约2.8万词条量级增长），比原来的朙月拼音词库大得多，T9 候选应该明显更准。\n· 提醒：因为词库变大很多，安装后第一次「重新部署」会比之前明显慢（要编译这个大词库），请耐心等一会，不是卡住。\n· APK 从 ~19.5MB 涨到 ~31MB，正常。\n\nSwitched 9-key layout to match Gboard exactly, and merged in rime-ice's core dictionary (much bigger than before) for better T9 candidate accuracy. First redeploy after install will take noticeably longer — that's expected, not a hang."
 }
