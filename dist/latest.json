@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-15-gdb9ab214",
-  "commit": "db9ab214c60c2ee4bbd7c3a7f449c84bfbcb5504",
+  "versionName": "v3.3.11-17-gf83e0239",
+  "commit": "f83e0239f3502e1857221efc72df88071aa91160",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
   "notes": "拼音九宫格 (T9) ⇄ 全键 一键切换 + 应用内自动检查更新。\n\n· 九宫格与全键盘可直接切换：长按 Shift（或上滑「中/西」键）切到九宫格；九宫格上的「全键」键切回。切换的其实是 rime 方案，键盘布局自动跟随。\n· 「拼音九宫格」方案：键盘发送数字 2-9，候选由词库词频决定（真正的九宫格逻辑）。\n· 关于页「检查更新」，App 启动时也会静默检查。\n\nOne-tap switch between the T9 nine-key grid and full qwerty (long-press Shift to enter 9-key, 全键 key to return). arm64-v8a debug build."
 }
