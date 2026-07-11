@@ -1,45 +1,106 @@
-# Rime schema
+# Rime schema — 拼音九宫格 (T9) for Trime
 # encoding: utf-8
 #
-# 拼音九宮格 (T9): built on top of 朙月拼音 (luna_pinyin) and its existing
-# dictionary/word-frequency data. The keyboard sends plain digits 2-9
-# (phone-keypad letter groups); which of the 3-4 letters on a key was
-# "meant" is never specified by the user — it's resolved the same way
-# every 九宮格 IME does it: the speller derives every possible digit
-# encoding for each dictionary entry's pinyin spelling, and candidates
-# are ranked by the entry's existing frequency data (詞庫), exactly like
-# normal pinyin input. No new dictionary is needed, only extra spelling
-# variants over the current one.
+# 真正的九宫格：键盘只发送数字 2-9（2=abc 3=def … 9=wxyz）。用户按下的
+# 数字是「模糊」的——到底是这一键上的哪个字母，不由键盘决定，而是由下面
+# speller/algebra 里的 `xlit` 把每个拼音音节整体转写成它的数字编码
+# （例：ni → 64、hao → 426），再拿输入的数字序列去词库里匹配，候选按
+# 词库词频排序。这正是 Google／搜狗等九宫格输入法的做法。
 #
-# Digit mapping (standard phone keypad):
-#   2=abc 3=def 4=ghi 5=jkl 6=mno 7=pqrs 8=tuv 9=wxyz
-
-__include: luna_pinyin.schema.yaml:/
+# 候选带完整带调拼音提示（translator/spelling_hints），所以虽然编码区
+# 显示的是数字，候选项上仍能看到对应的拼音。
+#
+# 词库直接复用朙月拼音（luna_pinyin.dict.yaml），无需新造词库。
 
 schema:
   schema_id: t9_pinyin
-  name: 拼音九宮格
-  version: '0.1'
+  name: 拼音九宫格
+  version: "0.2"
   author:
     - trime-9key
   description: |
-    朙月拼音的九宮格（T9）變體：鍵盤只發送數字 2-9，候選由詞庫詞頻決定。
+    朙月拼音的九宫格（T9）变体：键盘发送数字 2-9，候选由词库词频决定。
+  dependencies:
+    - stroke
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: simplification
+    states: [ 漢字, 汉字 ]
+  - name: ascii_punct
+    states: [ 。，, ．， ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - script_translator
+  filters:
+    - simplifier
+    - uniquifier
 
 speller:
-  alphabet: zyxwvutsrqponmlkjihgfedcba9876543210
+  # 键盘发送的是数字 2-9，它们必须在 alphabet 里，speller 才会把它们当作
+  # 编码来组词；否则数字会被当成普通字符直接上屏（就会「全是数字」）。
+  alphabet: '23456789'
   delimiter: " '"
   algebra:
-    __patch:
-      - pinyin:/abbreviation
-      - pinyin:/spelling_correction
-      - pinyin:/key_correction
-      # 九宮格數字映射：必須放在其餘規則之後，這樣其餘規則新生成的字母
-      # （如 iu -> iou）也能被正確映射到數字。
-      - derive/[abc]/2/
-      - derive/[def]/3/
-      - derive/[ghi]/4/
-      - derive/[jkl]/5/
-      - derive/[mno]/6/
-      - derive/[pqrs]/7/
-      - derive/[tuv]/8/
-      - derive/[wxyz]/9/
+    # 先做常见的简拼 / 模糊音 / 纠错，得到各种字母拼写……
+    - abbrev/^([a-z]).+$/$1/          # 简拼：取首字母
+    - abbrev/^([zcs]h).+$/$1/         # zh/ch/sh 视为整体的简拼
+    - derive/^([nl])ve$/$1ue/
+    - derive/^([jqxy])u/$1v/
+    - derive/un$/uen/
+    - derive/ui$/uei/
+    - derive/iu$/iou/
+    - derive/([aeiou])ng$/$1gn/
+    - derive/([dtngkhrzcs])o(u|ng)$/$1o/
+    - derive/ong$/on/
+    - derive/ao$/oa/
+    - derive/([iu])a(o|ng?)$/a$1$2/
+    # ……最后把 26 个字母整体转写成 T9 数字（一次性替换，保证生成完整的
+    # 数字编码，如 ni → 64）。这一步必须放在最后。
+    - xlit/abcdefghijklmnopqrstuvwxyz/22233344455566677778889999/
+
+translator:
+  dictionary: luna_pinyin       # 复用朙月拼音词库
+  prism: t9_pinyin              # 单独编译数字编码的 prism
+  spelling_hints: 16            # 候选标注完整带调拼音（九宫格的拼音提示）
+  enable_sentence: true
+
+reverse_lookup:
+  dictionary: stroke
+  enable_completion: true
+  prefix: "`"
+  suffix: "'"
+  tips: 〔笔画〕
+
+punctuator:
+  import_preset: symbols
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "`[a-z]*'?$"
