@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-17-gf83e0239",
-  "commit": "f83e0239f3502e1857221efc72df88071aa91160",
+  "versionName": "v3.3.11-20-g2b33ce39",
+  "commit": "2b33ce39bd7ec2a423e25b86d5053316a6eeb57b",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "拼音九宫格 (T9) ⇄ 全键 一键切换 + 应用内自动检查更新。\n\n· 九宫格与全键盘可直接切换：长按 Shift（或上滑「中/西」键）切到九宫格；九宫格上的「全键」键切回。切换的其实是 rime 方案，键盘布局自动跟随。\n· 「拼音九宫格」方案：键盘发送数字 2-9，候选由词库词频决定（真正的九宫格逻辑）。\n· 关于页「检查更新」，App 启动时也会静默检查。\n\nOne-tap switch between the T9 nine-key grid and full qwerty (long-press Shift to enter 9-key, 全键 key to return). arm64-v8a debug build."
+  "notes": "修复：九宫格现在真的出拼音/汉字，不再是「一堆数字」。\n\n· 之前 speller 用 derive 级联映射数字，实际没把完整数字编码写进 prism，所以数字匹配不到词、直接上屏数字。改用 xlit 一次性把字母整体转写成 T9 数字（ni→64、hao→426），复用朙月拼音词库，候选带完整带调拼音提示。\n· 切换：长按 Shift（或上滑「中/西」键）进九宫格；九宫格上「全键」键回全键盘。\n· 用法：安装后先「重新部署」编译新方案，再在九宫格上按数字，选字。\n\nFix: the 9-key now yields real pinyin/Chinese instead of plain numbers (xlit digit-encoding + luna_pinyin dictionary). Redeploy after install. arm64-v8a debug build."
 }
