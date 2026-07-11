@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-26-g27f4fe6d",
-  "commit": "27f4fe6d0e6c23461555b5bd7ecb72bbd75befba",
+  "versionName": "v3.3.11-29-gae4d9f4a",
+  "commit": "ae4d9f4a386ca42ab9ab5449243f512c7e20d48e",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "重要修复：不再和你另一个「同文/Trime」抢同一个数据文件夹了。\n\n· 之前两个 App 都往 /sdcard/rime 里编译词库，另一个 Trime 一部署就把我们的九宫格大词库覆盖了，所以候选会消失。现在本 App 用独立的 /sdcard/trime9key 文件夹，互不干扰。\n· App 改名为 Trime9Key，和上游 Trime 区分开。\n· 九宫格改成中文九键经典布局：左三列数字盘（，。?! / ABC / DEF … 全键 / 符 / 空格 / 回车），右侧一列功能键（退格 / 分词 / 中英）。\n· 已在真机验证：输入 64 出「你 密 米 迷 秘 尼 泥 弥」等候选，词频排序，和谷歌九宫格一致。\n\nFixed the vanishing-candidates bug: the app now deploys into its own /sdcard/trime9key folder instead of sharing /sdcard/rime with an upstream Trime install (which was clobbering our dictionary). Renamed to Trime9Key. Chinese 9-key layout. Verified on-device."
+  "notes": "编码区显示拼音（不再是数字）+ emoji。\n\n· 九宫格打字时，编码区现在显示拼音（如输入 64 显示「ni」），不再显示「64」这种数字。原理：用一个 lua 过滤器把候选的 preedit 覆盖成它的拼音提示。\n· 「分词」键换成了 emoji 键（😀，点开表情面板；长按仍是分词）。\n· 输入词语时会附带对应的 emoji 候选（用了雾凇 rime-ice 的 emoji 词表，比如打「秘」会带出 ㊙）。\n· 全部已在真机验证。\n\nComposing area now shows pinyin instead of the T9 digits (64 → \"ni\"), the 分词 key is now an emoji shortcut (😀), and typing words also offers matching emoji candidates. All verified on-device."
 }
