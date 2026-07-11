@@ -1,0 +1,6 @@
+{
+  "versionName": "v3.3.11-13-g3cbff7ef",
+  "commit": "3cbff7efb0b85c818691504528bca7870998564e",
+  "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
+  "notes": "拼音九宫格 (T9) 输入方案 + 应用内自动检查更新。\n\n· 新增「拼音九宫格」rime 方案：键盘发送数字 2-9，候选由词库词频决定（真正的九宫格逻辑）。部署后在方案列表里选择「拼音九宫格」。\n· 关于页新增「检查更新」，App 每次启动也会静默检查。\n\nT9 (nine-key) pinyin schema + in-app update check. Deploy, then pick 拼音九宫格 in the schema list. arm64-v8a debug build."
+}

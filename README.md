@@ -4,9 +4,34 @@ SPDX-FileCopyrightText: 2015 - 2024 Rime community
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
 
-# Trime
+# Trime-9key （拼音九宫格 / T9）
 
-Rime IME for Android
+Rime IME for Android — a fork of [osfans/trime](https://github.com/osfans/trime) that adds a **拼音九宫格 (T9 nine-key) pinyin input method** and an **in-app update checker**.
+
+## 🔟 What this fork adds
+
+- **拼音九宫格 (T9) input** — a phone-keypad layout where keys send digits `2`–`9`
+  (`2=abc … 9=wxyz`). Which letter you "meant" is *not* chosen at the keyboard; it is
+  resolved by the dictionary's word-frequency (词库), the way every real 九宫格 IME works.
+  Implemented purely as a Rime schema ([`t9_pinyin.schema.yaml`](app/src/main/assets/shared/t9_pinyin.schema.yaml))
+  built on top of 朙月拼音 (luna_pinyin), reusing its existing dictionary — no new word list needed.
+  After deploying, pick **拼音九宫格** in the schema list.
+- **Self-update** — the app checks [`dist/latest.json`](dist/latest.json) on launch (and via
+  *About → Check for updates*) and offers to download & install a newer build by itself.
+
+## 📥 Download (test build)
+
+> Unsigned **debug** build, `arm64-v8a` only. For testing the 9-key feature.
+
+**[⬇️ Download the latest APK](dist/trime-9key-debug-arm64-v8a.apk?raw=1)** — then open it on your phone to install.
+
+Once installed, the app keeps itself up to date: it reads the commit recorded in
+[`dist/latest.json`](dist/latest.json), compares it against its own build, and prompts you
+when a newer APK has been pushed here.
+
+---
+
+## Upstream Trime
 
 ![build](https://github.com/osfans/trime/actions/workflows/commit-ci.yml/badge.svg?branch=develop)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
