@@ -25,6 +25,7 @@ object DataManager {
     private const val SCHEMA_LIST_CUSTOM_PATCH = """
       patch:
         schema_list:
+          - schema: t9_pinyin
           - schema: luna_pinyin
           - schema: luna_pinyin_simp
     """
@@ -52,7 +53,10 @@ object DataManager {
 
     private val prefs by lazy { AppPrefs.defaultInstance() }
 
-    val defaultDataDir = File(Environment.getExternalStorageDirectory(), "rime")
+    // trime-9key: own data folder, so deploys never collide with an upstream
+    // Trime install sharing /sdcard/rime (both apps compile schemas into
+    // <userDataDir>/build and clobber each other's dictionaries).
+    val defaultDataDir = File(Environment.getExternalStorageDirectory(), "trime9key")
 
     val sharedDataDir = File(appContext.getExternalFilesDir(null), "shared").also { it.mkdirs() }
 

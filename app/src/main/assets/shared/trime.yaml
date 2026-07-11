@@ -1218,30 +1218,33 @@ preset_keyboards:
     name: 拼音九宮格
     author: "trime-9key"
     ascii_mode: 0
-    columns: 3 #每行3鍵，超過則自動換行
-    width: 33.33
+    columns: 4 #每行4鍵，超過則自動換行
+    width: 25
     height: 55
     lock: true #切換程序時記憶鍵盤
-    # 完全照搬 Google 拼音（Gboard）九宮格的經典 4x3 佈局：
-    #   1(,.?)  2ABC  3DEF
-    #   4GHI    5JKL  6MNO
-    #   7PQRS   8TUV  9WXYZ
-    #   Shift   0空格  退格
-    # Gboard 不需要處理「切回全鍵盤」和「回車」，這裡用手勢掛在既有鍵位上，
-    # 不额外加鍵、不破壞這個佈局的外觀：長按 Shift 切回全鍵盤；空格上滑回車。
+    # 中文九宮格經典佈局（谷歌拼音/Gboard 中文九鍵的結構）：
+    # 左邊 3 列是數字盤，右邊一列是功能列。
+    #   ，。？！  2ABC   3DEF    ⌫
+    #   4GHI     5JKL   6MNO    分词(')
+    #   7PQRS    8TUV   9WXYZ   中|英
+    #   全键      符123   空格0    回车
     keys:
-    - {label: '1', hint: ',.!?', click: '.', long_click: '!', swipe_left: ',', swipe_right: '?', popup: ['.', ',', '?', '!']}
+    - {label: '，。？！', click: ',', long_click: '。', popup: ['，', '。', '？', '！', '、', '：', '；'], key_text_size: 16}
     - {label: ABC, click: '2'}
     - {label: DEF, click: '3'}
+    - {click: BackSpace, long_click: Escape}
     - {label: GHI, click: '4'}
     - {label: JKL, click: '5'}
     - {label: MNO, click: '6'}
+    - {label: 分词, click: "'"}
     - {label: PQRS, click: '7'}
     - {label: TUV, click: '8'}
     - {label: WXYZ, click: '9'}
-    - {click: Shift_L, long_click: switch_to_qwerty, send_bindings: false}
-    - {click: space, label: 空格, hint: '0', swipe_up: Return}
-    - {click: BackSpace, long_click: Escape}
+    - {click: Mode_switch}
+    - {click: switch_to_qwerty, label: 全键}
+    - {click: Keyboard_symbols, label: 符, long_click: Keyboard_number}
+    - {click: space, label: 空格, hint: '0'}
+    - {click: Return, composing: Return1, long_click: CommitComment}
   us_intl:
     name: 美式國際
     author: "Terry Tsang <archerindigo@gmail.com>"
