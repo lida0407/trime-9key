@@ -207,7 +207,22 @@ class CommonKeyboardActionListener {
                     "apply" -> handleApplyCommand(arg)
                     "share_text" -> service.shareText()
                     "select_candidate" -> handleSelectCandidate(arg)
+                    "select_schema" -> handleSelectSchema(arg)
                     else -> handleIntentAction(action.command, arg)
+                }
+            }
+
+            // trime-9key: switch the active Rime schema by id (e.g. between the
+            // qwerty pinyin schema `luna_pinyin` and the 9-key `t9_pinyin`).
+            // The keyboard layout follows automatically: selecting a schema fires
+            // onRimeSchemaUpdated -> switchKeyboard(".default") -> smartMatchKeyboard(),
+            // which picks the preset keyboard whose id equals the schema id.
+            private fun handleSelectSchema(schemaId: String) {
+                if (schemaId.isEmpty()) return
+                rime.launchOnReady { api ->
+                    service.lifecycleScope.launch {
+                        api.selectSchema(schemaId)
+                    }
                 }
             }
 
