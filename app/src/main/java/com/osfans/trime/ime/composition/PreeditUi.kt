@@ -27,6 +27,7 @@ open class PreeditUi(
     private val theme: Theme,
     private val setupPreeditView: (TextView.() -> Unit)? = null,
     private val onMoveCursor: ((Int) -> Unit)? = null,
+    private val onDragLetter: ((offset: Int, forward: Boolean) -> Unit)? = null,
 ) : Ui {
     private val textColor = ColorManager.getColor("text_color")
     private val highlightTextColor = ColorManager.getColor("hilited_text_color")
@@ -38,6 +39,7 @@ open class PreeditUi(
             typeface = FontManager.getTypeface("text_font")
             setupPreeditView?.invoke(this)
             onMoveCursor = this@PreeditUi.onMoveCursor
+            onDragLetter = this@PreeditUi.onDragLetter
         }
 
     override val root =
