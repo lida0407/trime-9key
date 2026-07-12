@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-38-g01e7f3a9",
-  "commit": "01e7f3a956a1f5492df081368ffbb5f015856b18",
+  "versionName": "v3.3.11-40-g097fc516",
+  "commit": "097fc5168aa5ba114c668e54a1dda09df691af22",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "九宫格按键直接选字母 + 手势气泡预览。\n\n· 数字键上直接选字母：按住 GHI 后，左滑＝g、原地松手＝h、右滑＝i（与键面字母顺序一致；PQRS/WXYZ 四字母键加上滑）。选中的字母会进入拼音组字——纠正当前词的重码字母（hao→gao）、开启新的拼音组字、或追加为下一个字母——不会再作为单个字符直接打出来。\n· 手势气泡预览：拖动时按键上方会浮出气泡，实时显示松手会得到的字母/符号（g/h/i、？、！、@ 等），不用再猜。修复了弹出层从未显示过的三个隐藏问题（主题缺少 popup 尺寸时默认为 0、坐标系换算错误、无绑定方向会崩溃）。\n· 纠错时键盘会切到全键字母盘（此时输入的是精确拼音，全键才是对的），选字上屏后自动回到九宫格。修复了之前「九宫格盘面盖在字母方案上、按数字键变成选候选词」的错乱状态。\n· 修复纠错状态机的线程竞态：之前偶发「纠错刚开始就被弹回九宫格」。\n· 全部真机验证：空组字选 g →「g」进入组字（候选 高/個/給…）→ 全键补 ao →「gao」→ 选「高」上屏 → 自动回九宫格；426→hao→选 g→gao 同样正常。\n\nPick exact letters on the T9 keys (hold GHI: drag left/release/right = g/h/i, matching the key label), with a live preview bubble showing what you'll get before release. Picked letters always join the pinyin composition (correct/start/append) instead of printing raw. The keyboard follows the schema during corrections (letter grid while composing exact pinyin, back to 9-key on commit). Fixed the never-rendering popup layer and a correction-state race. All verified on-device."
+  "notes": "连续拖选字母组词：h、a、o 全程手势，直接出「好 號 浩…」。\n\n· 现在可以完全用拖选手势打整个词：按住 GHI 原地松手＝h，ABC 左滑＝a，MNO 右滑＝o，编码区依次组成「hao」，候选实时显示 好/號/浩/豪/耗…，点选上屏。\n· 整个过程九宫格盘面保持不动（之前选完第一个字母就切到全键盘，拖选目标直接消失）。\n· 选字母期间误点数字键不会再乱选候选词（自动忽略；退格、空格、候选、标点一切正常）。\n· 点编码区可移动光标，按 Rime 分段显示候选，正常行为。\n· 全部真机验证。\n\nBuild whole words with successive drag-picks on the 9-key grid: hold GHI = h, ABC drag-left = a, MNO drag-right = o -> \"hao\" composing with 好/號/浩... candidates. The 9-key grid stays for the whole session (it used to flip away after the first pick), stray digit taps are ignored mid-session, and everything verified on-device."
 }
