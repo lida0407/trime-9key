@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-36-g39e4610f",
-  "commit": "39e4610fbfef9bd020396f0448ab920a917abe46",
+  "versionName": "v3.3.11-38-g01e7f3a9",
+  "commit": "01e7f3a956a1f5492df081368ffbb5f015856b18",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "修复：「按住再滑」也算滑动了。\n\n· 之前只有 300 毫秒内就开始移动的快速滑动才有效；如果你的习惯是按住、停一下、再往某个方向拖（很多人自然的「拖动」手势），长按会在你开始移动之前就把 。提交掉。\n· 现在长按的内容改为松手时才提交（和 Gboard 一致，震动仍在按住 300ms 时提示），按住之后再拖动照样算滑动，滑动优先于长按。\n· 真机按顺序验证了标点键全部五种手势：按住再上拖＝？、按住不动松手＝。、按住再下拖＝！、快速上滑＝？、点按＝，。左滑＝@、右滑＝、也仍然有效。\n· 编码区拖字母（hao→gao）用「按住再拖」的方式也验证通过。\n\nFixed: press-hold-THEN-move now counts as a swipe. Long-press text commits on release (like Gboard) instead of at the 300ms timeout, and a drag that develops after the hold outranks the long click. All five gesture paths verified on-device in sequence (？。！？，), plus @/、 side-swipes and the preedit letter-drag in hold-then-move style."
+  "notes": "九宫格按键直接选字母 + 手势气泡预览。\n\n· 数字键上直接选字母：按住 GHI 后，左滑＝g、原地松手＝h、右滑＝i（与键面字母顺序一致；PQRS/WXYZ 四字母键加上滑）。选中的字母会进入拼音组字——纠正当前词的重码字母（hao→gao）、开启新的拼音组字、或追加为下一个字母——不会再作为单个字符直接打出来。\n· 手势气泡预览：拖动时按键上方会浮出气泡，实时显示松手会得到的字母/符号（g/h/i、？、！、@ 等），不用再猜。修复了弹出层从未显示过的三个隐藏问题（主题缺少 popup 尺寸时默认为 0、坐标系换算错误、无绑定方向会崩溃）。\n· 纠错时键盘会切到全键字母盘（此时输入的是精确拼音，全键才是对的），选字上屏后自动回到九宫格。修复了之前「九宫格盘面盖在字母方案上、按数字键变成选候选词」的错乱状态。\n· 修复纠错状态机的线程竞态：之前偶发「纠错刚开始就被弹回九宫格」。\n· 全部真机验证：空组字选 g →「g」进入组字（候选 高/個/給…）→ 全键补 ao →「gao」→ 选「高」上屏 → 自动回九宫格；426→hao→选 g→gao 同样正常。\n\nPick exact letters on the T9 keys (hold GHI: drag left/release/right = g/h/i, matching the key label), with a live preview bubble showing what you'll get before release. Picked letters always join the pinyin composition (correct/start/append) instead of printing raw. The keyboard follows the schema during corrections (letter grid while composing exact pinyin, back to 9-key on commit). Fixed the never-rendering popup layer and a correction-state race. All verified on-device."
 }
