@@ -48,6 +48,15 @@ object T9CorrectionState {
     @Volatile
     private var pending: Boolean = false
 
+    /** True from the moment a pick/correction is requested until the word
+     * commits (or the user backs out). While this holds, the 9-key grid
+     * stays visible over the letter schema so the user can keep building
+     * the word with drag-picks (h, then a, then o -> "hao"), and bare digit
+     * taps are swallowed (the letter schema would read them as candidate
+     * selection). */
+    val isCorrecting: Boolean
+        get() = active || pending
+
     /** Latest composition seen by either preedit view; lets key-side
      * gestures ([pickLetter]) act on the current word without having their
      * own subscription to the Rime message stream. */
@@ -151,7 +160,10 @@ object T9CorrectionState {
         rime.launchOnReady { api ->
             api.clearComposition()
             api.selectSchema("luna_pinyin")
-            api.simulateKeySequence(corrected)
+            // multi-syllable preedits carry Rime's display separator (a
+            // space); retype it as the apostrophe, the typeable syllable
+            // divider, so the boundary survives the round trip.
+            api.simulateKeySequence(corrected.replace(' ', '\''))
         }
     }
 

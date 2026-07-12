@@ -284,11 +284,17 @@ class KeyboardWindow :
     }
 
     override fun onRimeSchemaUpdated(schema: SchemaItem) {
-        // trime-9key: use the id carried by the event itself. smartMatchKeyboard
-        // reads statusCached, which often hasn't caught up when this fires --
-        // switching t9_pinyin -> luna_pinyin would then re-match the OLD schema
-        // and leave the 9-key grid visible over the letter schema (where digit
-        // taps get read as candidate selection).
+        // trime-9key: while a letter-pick/correction session runs, the 9-key
+        // grid deliberately stays put -- the user builds the word with
+        // successive drag-picks (h, a, o), so the drag targets must not
+        // disappear under their finger. The schema alone flips to the letter
+        // schema; bare digit taps are swallowed meanwhile (see
+        // CommonKeyboardActionListener). Session end restores t9_pinyin,
+        // which passes through here normally.
+        if (T9CorrectionState.isCorrecting && schema.id != "t9_pinyin") return
+        // Use the id carried by the event itself. smartMatchKeyboard reads
+        // statusCached, which often hasn't caught up when this fires and
+        // would re-match the OLD schema's layout.
         switchKeyboard(if (presetKeyboardIds.contains(schema.id)) schema.id else "default")
     }
 

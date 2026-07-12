@@ -135,6 +135,14 @@ class CommonKeyboardActionListener {
             }
 
             override fun onAction(action: KeyAction) {
+                // trime-9key: during a letter-pick session the 9-key grid is
+                // shown over the letter schema, where a bare digit would be
+                // read as candidate selection -- swallow them. Building the
+                // rest of the word continues via drag-picks; everything else
+                // (backspace, space, candidates, punctuation) works normally.
+                if (T9CorrectionState.isCorrecting && action.code in KeyEvent.KEYCODE_2..KeyEvent.KEYCODE_9) {
+                    return
+                }
                 val shouldHandle = when {
                     action.commit.isNotEmpty() -> {
                         service.commitText(action.commit)
