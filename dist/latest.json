@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-29-gae4d9f4a",
-  "commit": "ae4d9f4a386ca42ab9ab5449243f512c7e20d48e",
+  "versionName": "v3.3.11-32-g93fa8ab3",
+  "commit": "93fa8ab30febf1961a120b832a030ec563316ed6",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "编码区显示拼音（不再是数字）+ emoji。\n\n· 九宫格打字时，编码区现在显示拼音（如输入 64 显示「ni」），不再显示「64」这种数字。原理：用一个 lua 过滤器把候选的 preedit 覆盖成它的拼音提示。\n· 「分词」键换成了 emoji 键（😀，点开表情面板；长按仍是分词）。\n· 输入词语时会附带对应的 emoji 候选（用了雾凇 rime-ice 的 emoji 词表，比如打「秘」会带出 ㊙）。\n· 全部已在真机验证。\n\nComposing area now shows pinyin instead of the T9 digits (64 → \"ni\"), the 分词 key is now an emoji shortcut (😀), and typing words also offers matching emoji candidates. All verified on-device."
+  "notes": "九宫格重码消歧：拖动可选字母；更大词库；标点键上下滑。\n\n· 新功能：九宫格重码时（如 4 键 GHI 打出 hao，但想要的是 gao），在编码区按住字母上下拖动，即可在该键的字母间切换（h → g），自动重新组字并显示新候选。真机验证：hao 拖动 h→g 后正确显示「高/搞/告/稿」等候选，选字后自动切回九宫格。\n· 词库：加入雾凇拼音（rime-ice）默认词库中的腾讯词向量扩展词库（约 17MB），提升候选覆盖率和排序准确度，直接减少重码困扰。\n· 标点键「，。？！」新增上滑＝？、下滑＝！，无需再进弹出面板。\n· 词库和标点手势这两项因手机断开 adb 连接，尚未在真机复测，请通过应用内自动更新安装后自行验证。\n\nNew: drag a letter in the T9 preedit up/down to cycle it through its key group and re-compose (e.g. 4-key GHI: \"hao\" → drag h→g → \"gao\", showing 高/搞/告/稿 etc.), fixing ambiguous-collision candidates. Verified live on-device. Also added rime-ice's larger tencent word dictionary (~17MB) for better candidate ranking, and swipe up/down on the ，。？！ key for ？/！. The dictionary and punctuation-gesture changes haven't been re-verified on-device yet (phone dropped its adb connection) — please test via in-app auto-update."
 }
