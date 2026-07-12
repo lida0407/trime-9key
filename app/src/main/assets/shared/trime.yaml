@@ -1229,7 +1229,9 @@ preset_keyboards:
     #   7PQRS    8TUV   9WXYZ   中|英
     #   全键      符123   空格0    回车
     keys:
-    - {label: '，。？！', click: ',', long_click: '。', swipe_up: '？', swipe_down: '！', popup: ['，', '。', '？', '！', '、', '：', '；'], key_text_size: 16}
+    # 注意：不要给这个键加 popup 列表 —— 本 fork 的弹出面板不渲染（颜色解析了
+    # 但窗口从不显示），而且 popup 存在时会屏蔽 long_click，导致长按完全失效。
+    - {label: '，。？！', click: ',', long_click: '。', swipe_up: '？', swipe_down: '！', swipe_left: '@', swipe_right: '、', key_text_size: 16}
     - {label: ABC, click: '2'}
     - {label: DEF, click: '3'}
     - {click: BackSpace, long_click: Escape}

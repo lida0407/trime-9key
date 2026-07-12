@@ -21,6 +21,7 @@ import com.osfans.trime.ime.keyboard.T9CorrectionState
 import org.kodein.di.instance
 import splitties.dimensions.dp
 import splitties.views.horizontalPadding
+import splitties.views.verticalPadding
 
 class PreeditDelegate : InputBroadcastReceiver {
 
@@ -53,6 +54,14 @@ class PreeditDelegate : InputBroadcastReceiver {
                 clipToOutline = true
                 outlineProvider = ViewOutlineProvider.BACKGROUND
                 horizontalPadding = dp(theme.preedit.horizontalPadding)
+                // trime-9key: the bare text strip is only ~4mm tall -- far
+                // smaller than a fingertip, which made the drag-to-correct
+                // gesture nearly impossible to land by hand (it only worked
+                // via pixel-exact adb taps). Pad it out to a comfortable
+                // touch target; the drag callbacks map any y within the view
+                // onto the nearest character, so the extra height all counts.
+                verticalPadding = dp(10)
+                minimumWidth = dp(48)
             },
             onMoveCursor = { pos -> rime.launchOnReady { it.moveCursorPos(pos) } },
             onDragLetter = { offset, forward -> T9CorrectionState.correctLetter(rime, composition, offset, forward) },

@@ -9,6 +9,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.SystemClock
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.widget.FrameLayout
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +42,8 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
     private val lifecycleScope by lazy {
         findViewTreeLifecycleOwner()?.lifecycleScope!!
     }
+
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
     var onClick: (() -> Unit)? = null
     var onDoubleClick: (() -> Unit)? = null
@@ -117,6 +120,19 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
                 val dy = y - startY
 
                 onMove?.invoke(x, y, isLongPressed)
+
+                // trime-9key: a finger that starts moving is swiping, not
+                // long-pressing. Without this, any swipe slower than
+                // longPressTimeout loses the race on keys that also have a
+                // long_click/popup (the long-press fires mid-gesture and
+                // permanently suppresses swipe detection for this touch) --
+                // which made slow drags on e.g. the punctuation key open the
+                // popup instead of committing swipe_up/swipe_down. Matches
+                // the standard Android convention that movement past touch
+                // slop cancels a pending long press.
+                if (!isLongPressed && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
+                    longPressJob?.cancel()
+                }
 
                 if ((isSlideCursor || isSlideDelete) && onSlide != null && !isLongPressed && swipeTravel > 0) {
                     if (!slideActivated) {
