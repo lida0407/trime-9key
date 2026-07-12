@@ -108,6 +108,13 @@ class KeyView(
                     setPressedState(false)
                 } else if (isRepeatable) {
                     key.getAction(KeyBehavior.CLICK)?.let { processKeyAction(it, KeyBehavior.CLICK) }
+                } else {
+                    // trime-9key: plain long_click commits here on release
+                    // (GestureFrame no longer fires it at the timeout), so a
+                    // hold that develops into a drag can still end as a swipe.
+                    key.getAction(KeyBehavior.LONG_CLICK)?.let { processKeyAction(it, KeyBehavior.LONG_CLICK) }
+                    setPressedState(false)
+                    dismissPopupPreview()
                 }
             } else {
                 when (behavior) {

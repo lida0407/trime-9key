@@ -121,16 +121,16 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
 
                 onMove?.invoke(x, y, isLongPressed)
 
-                // trime-9key: a finger that starts moving is swiping, not
-                // long-pressing. Without this, any swipe slower than
-                // longPressTimeout loses the race on keys that also have a
-                // long_click/popup (the long-press fires mid-gesture and
-                // permanently suppresses swipe detection for this touch) --
-                // which made slow drags on e.g. the punctuation key open the
-                // popup instead of committing swipe_up/swipe_down. Matches
-                // the standard Android convention that movement past touch
-                // slop cancels a pending long press.
-                if (!isLongPressed && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
+                // trime-9key: on popup keys, a finger that starts moving is
+                // swiping, not asking for the popup -- cancel the pending
+                // long press once movement passes touch slop, else any swipe
+                // slower than longPressTimeout opens the popup mid-gesture
+                // and swipe detection dies with it. Plain long_click keys
+                // don't need this: their commit is deferred to ACTION_UP,
+                // where a developed swipe already outranks the long click,
+                // and cancelling on mere slop would turn a wobbly-fingered
+                // long press into a plain click.
+                if (!isLongPressed && hasPopup && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
                     longPressJob?.cancel()
                 }
 
@@ -151,7 +151,14 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
                     }
                 }
 
-                if (!isLongPressed) {
+                // trime-9key: many users' natural "swipe" is press, hold a
+                // beat, THEN move -- which lands after the long-press fires.
+                // Keep detecting swipe past that point so the movement still
+                // wins on release. Popup keys are excluded (movement there
+                // means "choose within the popup") and so are repeatable keys
+                // (finger drift while holding e.g. BackSpace must not morph
+                // into a swipe).
+                if (!isLongPressed || (!hasPopup && !isRepeatable)) {
                     val behavior = detectSwipe(dx, dy)
                     if (behavior != lastSwipeBehavior) {
                         lastSwipeBehavior = behavior
@@ -178,13 +185,15 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
                     return true
                 }
 
-                if (isLongPressed) {
-                    dispatchBehavior(KeyBehavior.LONG_CLICK, true)
+                // trime-9key: movement outranks the hold -- a hold-then-drag
+                // is a swipe, not a long click (see the ACTION_MOVE comment).
+                if (swipeTriggered && lastSwipeBehavior != KeyBehavior.CLICK) {
+                    dispatchBehavior(lastSwipeBehavior, false)
                     return true
                 }
 
-                if (swipeTriggered) {
-                    dispatchBehavior(lastSwipeBehavior, false)
+                if (isLongPressed) {
+                    dispatchBehavior(KeyBehavior.LONG_CLICK, true)
                     return true
                 }
 
@@ -247,9 +256,18 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
 
             if (isRepeatable) {
                 startRepeatJob()
-            } else {
+            } else if (hasPopup) {
+                // popup must appear while the finger is still down, so the
+                // user can slide onto a choice.
                 performLongClick()
             }
+            // trime-9key: plain long_click keys used to commit right here, at
+            // the timeout -- so anyone whose swipe style is "hold, then move"
+            // had the long_click text committed before their movement even
+            // began. The commit now happens on ACTION_UP (dispatchBehavior
+            // LONG_CLICK -> KeyView.onRelease), where a swipe, if one
+            // developed, takes precedence. The vibration above still marks
+            // the moment the hold engages.
         }
     }
 
