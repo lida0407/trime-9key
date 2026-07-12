@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-34-g5e637e60",
-  "commit": "5e637e6030da303bcc1ed40e20e8f8d5b87152f7",
+  "versionName": "v3.3.11-36-g39e4610f",
+  "commit": "39e4610fbfef9bd020396f0448ab920a917abe46",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "修复：滑动/拖动手势现在用手指真的能用了 + @ 键。\n\n· 修复标点键上下滑失效：之前带长按功能的键有 300ms 长按计时器，手指滑动稍慢就会被长按抢先吞掉（adb 精准快速注入才能触发）。现在手指一开始移动就取消长按，慢滑也能出 ？/！。\n· 修复编码区拖字母难触发：原来那条「hao」小条只有约 4 毫米高，比指尖小得多。现在加大到约 8 毫米高，手指慢速拖动 h→g 已真机验证有效（出「高/搞/告/稿」候选）。\n· 标点键新增：左滑＝@，右滑＝、。长按＝。也修好了（之前被一个从不显示的弹出面板挡住，长按完全没反应）。\n· 全部用 500-600ms 手指速度的手势真机验证通过。\n\nFixed: swipe/drag gestures now work at real finger speeds (the 300ms long-press timer was eating slow swipes; the preedit drag strip was only ~4mm tall — now ~8mm). Punctuation key: swipe left = @, swipe right = 、, and long-press = 。 works again. All verified on-device at finger speeds."
+  "notes": "修复：「按住再滑」也算滑动了。\n\n· 之前只有 300 毫秒内就开始移动的快速滑动才有效；如果你的习惯是按住、停一下、再往某个方向拖（很多人自然的「拖动」手势），长按会在你开始移动之前就把 。提交掉。\n· 现在长按的内容改为松手时才提交（和 Gboard 一致，震动仍在按住 300ms 时提示），按住之后再拖动照样算滑动，滑动优先于长按。\n· 真机按顺序验证了标点键全部五种手势：按住再上拖＝？、按住不动松手＝。、按住再下拖＝！、快速上滑＝？、点按＝，。左滑＝@、右滑＝、也仍然有效。\n· 编码区拖字母（hao→gao）用「按住再拖」的方式也验证通过。\n\nFixed: press-hold-THEN-move now counts as a swipe. Long-press text commits on release (like Gboard) instead of at the 300ms timeout, and a drag that develops after the hold outranks the long click. All five gesture paths verified on-device in sequence (？。！？，), plus @/、 side-swipes and the preedit letter-drag in hold-then-move style."
 }
