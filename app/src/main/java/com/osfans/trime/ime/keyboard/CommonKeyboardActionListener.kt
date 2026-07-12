@@ -208,7 +208,20 @@ class CommonKeyboardActionListener {
                     "share_text" -> service.shareText()
                     "select_candidate" -> handleSelectCandidate(arg)
                     "select_schema" -> handleSelectSchema(arg)
+                    "t9_pick_letter" -> handlePickLetter(arg)
                     else -> handleIntentAction(action.command, arg)
+                }
+            }
+
+            // trime-9key: the user picked an exact letter on a T9 digit key
+            // (hold GHI: drag left/release/right = g/h/i). The letter always
+            // joins the pinyin composition -- correcting the word's
+            // ambiguous letter (hao -> gao), starting a fresh composition,
+            // or appending -- never committing as bare text.
+            private fun handlePickLetter(arg: String) {
+                val letter = arg.firstOrNull()?.lowercaseChar() ?: return
+                if (!T9CorrectionState.pickLetter(rime, letter)) {
+                    service.commitText(letter.toString())
                 }
             }
 

@@ -10,15 +10,24 @@ import com.osfans.trime.daemon.RimeSession
 import com.osfans.trime.daemon.launchOnReady
 
 /**
- * trime-9key: coordinates the "drag a preedit letter to correct it" feature.
+ * trime-9key: coordinates the T9 letter-disambiguation features.
  *
- * Correcting a letter (e.g. "hao" -> "gao") is done by briefly switching the
- * active Rime schema to a plain-letter pinyin schema, retyping the corrected
- * word, then switching back to `t9_pinyin` once it's committed. Switching
- * schema normally also re-picks the keyboard layout (see
- * `KeyboardWindow.smartMatchKeyboard`), which would flip the visible grid
- * away from the 9-key layout mid-correction -- that's the one thing this
- * flag exists to suppress for these two internal, momentary schema swaps.
+ * Two entry points share the same mechanism:
+ *  - [correctLetter]: drag a letter in the preedit up/down to cycle it
+ *    through its T9 group ("hao" -> "gao");
+ *  - [pickLetter]: pick an exact letter on the digit key itself (hold GHI,
+ *    drag left/release/right = g/h/i), which replaces the first letter of
+ *    that key's group in the current preedit.
+ *
+ * Correcting is done by switching the active Rime schema to a plain-letter
+ * pinyin schema, retyping the corrected word, then switching back to
+ * `t9_pinyin` once it's committed. The visible keyboard deliberately
+ * follows the schema both ways (`KeyboardWindow.smartMatchKeyboard`): while
+ * correcting, the letter keyboard is shown -- the composition is now exact
+ * pinyin and its keys do the right thing -- and committing the word brings
+ * the 9-key grid back. (An earlier "suppress the keyboard switch to keep
+ * the 9-key grid" flag left the T9 grid visible over the letter schema,
+ * where digit taps got interpreted as candidate selection.)
  *
  * Shared (rather than owned by one view) because Trime renders the preedit
  * in two places -- the inline `CandidatesView` and the floating
@@ -26,11 +35,51 @@ import com.osfans.trime.daemon.launchOnReady
  * touch -- and both need to trigger the same correction.
  */
 object T9CorrectionState {
+    /** A correction is composing under the letter schema. */
     @Volatile
-    var suppressNextKeyboardSwitch: Boolean = false
+    private var active: Boolean = false
 
+    /** A correction was requested but its text hasn't shown up in a
+     * composition yet. clearComposition()/selectSchema() each emit an empty
+     * CompositionMessage whose delivery races the correction request across
+     * threads -- flipping [active] on the first NON-empty composition (and
+     * ignoring empties until then) is the only ordering-safe signal that
+     * the correction is really underway. */
     @Volatile
-    var active: Boolean = false
+    private var pending: Boolean = false
+
+    /** Latest composition seen by either preedit view; lets key-side
+     * gestures ([pickLetter]) act on the current word without having their
+     * own subscription to the Rime message stream. */
+    @Volatile
+    var lastComposition: CompositionProto = CompositionProto()
+
+    /** Both preedit views funnel every composition update here. */
+    fun onComposition(
+        rime: RimeSession,
+        data: CompositionProto,
+    ) {
+        lastComposition = data
+        if (pending) {
+            if (data.length > 0) {
+                pending = false
+                active = true
+            }
+            return
+        }
+        // user backed all the way out of the word they were correcting: go
+        // back to fast T9 typing instead of staying on the letter schema.
+        if (active && data.length == 0) {
+            restoreT9Schema(rime)
+        }
+    }
+
+    /** Committing anything while correcting ends the correction. */
+    fun onCommit(rime: RimeSession) {
+        if (active) {
+            restoreT9Schema(rime)
+        }
+    }
 
     private val letterGroups = listOf("abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz")
 
@@ -59,27 +108,57 @@ object T9CorrectionState {
         val idx = group.indexOf(ch)
         val nextIdx = ((if (forward) idx + 1 else idx - 1) + group.length) % group.length
         val corrected = current.substring(0, adjustedOffset) + group[nextIdx] + current.substring(adjustedOffset + 1)
+        applyCorrection(rime, corrected)
+    }
+
+    /**
+     * The user picked an exact [letter] on its T9 key. The letter always
+     * becomes part of the pinyin composition, never bare committed text:
+     *  - empty composition: the letter STARTS a composition ("g" composing
+     *    with candidates), ready for more letters;
+     *  - the current word has a letter of the same T9 group: that letter is
+     *    corrected to the picked one (hao -> gao) and re-composed;
+     *  - otherwise: the letter is appended as the next exact pinyin letter.
+     *
+     * Returns false only for non-letter input the caller should handle.
+     */
+    fun pickLetter(
+        rime: RimeSession,
+        letter: Char,
+    ): Boolean {
+        val group = letterGroups.find { letter in it } ?: return false
+        val raw = lastComposition.preedit?.replace(CURSOR_MARK.toString(), "").orEmpty()
+        if (raw.isBlank()) {
+            applyCorrection(rime, letter.toString())
+            return true
+        }
+        val idx = raw.indexOfFirst { it.lowercaseChar() in group }
+        val corrected = when {
+            idx < 0 -> raw + letter
+            raw[idx].lowercaseChar() == letter -> return true
+            else -> raw.substring(0, idx) + letter + raw.substring(idx + 1)
+        }
+        applyCorrection(rime, corrected)
+        return true
+    }
+
+    private fun applyCorrection(
+        rime: RimeSession,
+        corrected: String,
+    ) {
+        pending = true
+        active = false
         rime.launchOnReady { api ->
-            // Both clearComposition() and selectSchema() reset the engine's
-            // composition state and each emits their own empty
-            // CompositionMessage. `active` must stay false until both have
-            // happened, otherwise the empty-composition listener (see
-            // CandidatesView/PreeditDelegate) reads one of those resets as
-            // "user backed out of the correction" and races
-            // restoreT9Schema's selectSchema("t9_pinyin") against
-            // simulateKeySequence below.
-            suppressNextKeyboardSwitch = true
             api.clearComposition()
             api.selectSchema("luna_pinyin")
-            active = true
             api.simulateKeySequence(corrected)
         }
     }
 
-    fun restoreT9Schema(rime: RimeSession) {
+    private fun restoreT9Schema(rime: RimeSession) {
         active = false
+        pending = false
         rime.launchOnReady { api ->
-            suppressNextKeyboardSwitch = true
             api.selectSchema("t9_pinyin")
         }
     }

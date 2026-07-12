@@ -63,6 +63,11 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
     var onMove: ((x: Float, y: Float, longPress: Boolean) -> Unit)? = null
     var onSwipe: ((behavior: KeyBehavior) -> Unit)? = null
 
+    /** trime-9key: fires when a plain long press engages (at the timeout,
+     * alongside the haptic) -- the commit itself is deferred to release, so
+     * this is the listener's chance to preview what release will produce. */
+    var onLongPressEngaged: (() -> Unit)? = null
+
     var isRepeatable = false
     var isSlideCursor = false
     var isSlideDelete = false
@@ -162,9 +167,9 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
                     val behavior = detectSwipe(dx, dy)
                     if (behavior != lastSwipeBehavior) {
                         lastSwipeBehavior = behavior
-                        if (behavior != KeyBehavior.CLICK) {
-                            onSwipe?.invoke(behavior)
-                        }
+                        // also fired when the direction falls back to CLICK,
+                        // so the listener can clear its gesture preview.
+                        onSwipe?.invoke(behavior)
                     }
                 }
 
@@ -268,6 +273,9 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
             // LONG_CLICK -> KeyView.onRelease), where a swipe, if one
             // developed, takes precedence. The vibration above still marks
             // the moment the hold engages.
+            else if (hasLongPress) {
+                onLongPressEngaged?.invoke()
+            }
         }
     }
 

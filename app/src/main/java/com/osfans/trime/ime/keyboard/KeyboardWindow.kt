@@ -284,11 +284,12 @@ class KeyboardWindow :
     }
 
     override fun onRimeSchemaUpdated(schema: SchemaItem) {
-        if (T9CorrectionState.suppressNextKeyboardSwitch) {
-            T9CorrectionState.suppressNextKeyboardSwitch = false
-            return
-        }
-        switchKeyboard(".default")
+        // trime-9key: use the id carried by the event itself. smartMatchKeyboard
+        // reads statusCached, which often hasn't caught up when this fires --
+        // switching t9_pinyin -> luna_pinyin would then re-match the OLD schema
+        // and leave the 9-key grid visible over the letter schema (where digit
+        // taps get read as candidate selection).
+        switchKeyboard(if (presetKeyboardIds.contains(schema.id)) schema.id else "default")
     }
 
     override fun onRimeOptionUpdated(value: RimeMessage.OptionMessage.Data) {

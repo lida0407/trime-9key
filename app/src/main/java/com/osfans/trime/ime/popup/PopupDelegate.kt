@@ -97,9 +97,15 @@ class PopupDelegate {
             add(
                 v,
                 lParams(popupWidth, popupHeight) {
-                    // align popup bottom with key border bottom
-                    topMargin = bounds.bottom - popupHeight - popupBottomMargin
-                    leftMargin = (bounds.left + bounds.right - popupWidth) / 2
+                    // trime-9key: `bounds` is in window coordinates while the
+                    // margins are relative to `root`, which does not sit at
+                    // the window origin -- convert like showPopupContainer
+                    // does, or every preview bubble lands too low/right by
+                    // the root's own offset.
+                    // The bubble hangs above the key: its bottom at the key's
+                    // top edge, minus the configured margin.
+                    topMargin = bounds.top - popupHeight - popupBottomMargin - rootBounds.top
+                    leftMargin = (bounds.left + bounds.right - popupWidth) / 2 - rootBounds.left
                 },
             )
         }

@@ -45,6 +45,13 @@ style:
   preview_height: 60 #按鍵提示高度
   preview_offset: -12 #按鍵提示縱向偏移
   preview_text_size: 40 #按鍵提示字號
+  # trime-9key：手勢預覽氣泡尺寸。代碼裡這幾項（含 popup_text_size）默認
+  # 為 0，不寫的話所有按鍵氣泡（滑動/長按提示）都會以 0x0 渲染或文字不可見。
+  popup_width: 52 #手勢預覽氣泡寬
+  popup_height: 60 #手勢預覽氣泡高
+  popup_key_height: 48 #彈出鍵盤鍵高
+  popup_bottom_margin: 6 #氣泡與按鍵的間距
+  popup_text_size: 26 #氣泡字號
   reset_ascii_mode_on_focus_change: false #焦点变更弹起输入法软键盘时，重置 ascii_mode
   round_corner: 8 #按鍵圓角半徑
   shadow_radius: 0.0 #按鍵陰影半徑
@@ -919,6 +926,35 @@ preset_keys:
   # （见 KeyboardWindow.smartMatchKeyboard：布局 id 等于方案 id 时自动选用）。
   switch_to_t9: {label: 九宫格, send: function, command: select_schema, option: t9_pinyin}
   switch_to_qwerty: {label: 全键, send: function, command: select_schema, option: luna_pinyin}
+  # trime-9key：九宫格精确选字母。在数字键上按住/滑动选出该键上的具体字母
+  # （如 GHI 键：左滑=g、长按原地松手=h、右滑=i），用于重码消歧（hao→gao）。
+  # 处理逻辑见 CommonKeyboardActionListener 的 t9_pick_letter 命令。
+  t9_pick_a: {label: a, send: function, command: t9_pick_letter, option: a}
+  t9_pick_b: {label: b, send: function, command: t9_pick_letter, option: b}
+  t9_pick_c: {label: c, send: function, command: t9_pick_letter, option: c}
+  t9_pick_d: {label: d, send: function, command: t9_pick_letter, option: d}
+  t9_pick_e: {label: e, send: function, command: t9_pick_letter, option: e}
+  t9_pick_f: {label: f, send: function, command: t9_pick_letter, option: f}
+  t9_pick_g: {label: g, send: function, command: t9_pick_letter, option: g}
+  t9_pick_h: {label: h, send: function, command: t9_pick_letter, option: h}
+  t9_pick_i: {label: i, send: function, command: t9_pick_letter, option: i}
+  t9_pick_j: {label: j, send: function, command: t9_pick_letter, option: j}
+  t9_pick_k: {label: k, send: function, command: t9_pick_letter, option: k}
+  t9_pick_l: {label: l, send: function, command: t9_pick_letter, option: l}
+  t9_pick_m: {label: m, send: function, command: t9_pick_letter, option: m}
+  t9_pick_n: {label: n, send: function, command: t9_pick_letter, option: n}
+  t9_pick_o: {label: o, send: function, command: t9_pick_letter, option: o}
+  t9_pick_p: {label: p, send: function, command: t9_pick_letter, option: p}
+  t9_pick_q: {label: q, send: function, command: t9_pick_letter, option: q}
+  t9_pick_r: {label: r, send: function, command: t9_pick_letter, option: r}
+  t9_pick_s: {label: s, send: function, command: t9_pick_letter, option: s}
+  t9_pick_t: {label: t, send: function, command: t9_pick_letter, option: t}
+  t9_pick_u: {label: u, send: function, command: t9_pick_letter, option: u}
+  t9_pick_v: {label: v, send: function, command: t9_pick_letter, option: v}
+  t9_pick_w: {label: w, send: function, command: t9_pick_letter, option: w}
+  t9_pick_x: {label: x, send: function, command: t9_pick_letter, option: x}
+  t9_pick_y: {label: y, send: function, command: t9_pick_letter, option: y}
+  t9_pick_z: {label: z, send: function, command: t9_pick_letter, option: z}
   liquid_keyboard_switch: { label: 更多, send: function, command: liquid_keyboard, option: "更多" }
   liquid_keyboard_exit: {label: 返回, send: function, command: liquid_keyboard, option: "-1"}  #退出liquidkeyboard
   liquid_keyboard_emoji: { label: 🙂, send: function, command: liquid_keyboard, option: "emoji" }
@@ -1229,19 +1265,21 @@ preset_keyboards:
     #   7PQRS    8TUV   9WXYZ   中|英
     #   全键      符123   空格0    回车
     keys:
-    # 注意：不要给这个键加 popup 列表 —— 本 fork 的弹出面板不渲染（颜色解析了
-    # 但窗口从不显示），而且 popup 存在时会屏蔽 long_click，导致长按完全失效。
+    # 注意：不要给键加 popup 列表 —— popup 会屏蔽 long_click。手势预览气泡
+    # 依赖 style 里的 popup_width/popup_height（缺省为 0 时什么都看不见）。
+    # 字母键手势：按住后左滑/原地松手/右滑 = 选该键左/中/右字母（四字母键
+    # 加上滑），用于重码消歧（如 426 出 hao，GHI 键左滑选 g 变 gao）。
     - {label: '，。？！', click: ',', long_click: '。', swipe_up: '？', swipe_down: '！', swipe_left: '@', swipe_right: '、', key_text_size: 16}
-    - {label: ABC, click: '2'}
-    - {label: DEF, click: '3'}
+    - {label: ABC, click: '2', swipe_left: t9_pick_a, long_click: t9_pick_b, swipe_right: t9_pick_c}
+    - {label: DEF, click: '3', swipe_left: t9_pick_d, long_click: t9_pick_e, swipe_right: t9_pick_f}
     - {click: BackSpace, long_click: Escape}
-    - {label: GHI, click: '4'}
-    - {label: JKL, click: '5'}
-    - {label: MNO, click: '6'}
+    - {label: GHI, click: '4', swipe_left: t9_pick_g, long_click: t9_pick_h, swipe_right: t9_pick_i}
+    - {label: JKL, click: '5', swipe_left: t9_pick_j, long_click: t9_pick_k, swipe_right: t9_pick_l}
+    - {label: MNO, click: '6', swipe_left: t9_pick_m, long_click: t9_pick_n, swipe_right: t9_pick_o}
     - {click: liquid_keyboard_emoji, label: 😀, long_click: "'"}
-    - {label: PQRS, click: '7'}
-    - {label: TUV, click: '8'}
-    - {label: WXYZ, click: '9'}
+    - {label: PQRS, click: '7', swipe_left: t9_pick_p, swipe_up: t9_pick_q, long_click: t9_pick_r, swipe_right: t9_pick_s}
+    - {label: TUV, click: '8', swipe_left: t9_pick_t, long_click: t9_pick_u, swipe_right: t9_pick_v}
+    - {label: WXYZ, click: '9', swipe_left: t9_pick_w, swipe_up: t9_pick_x, long_click: t9_pick_y, swipe_right: t9_pick_z}
     - {click: Mode_switch}
     - {click: switch_to_qwerty, label: 全键}
     - {click: Keyboard_symbols, label: 符, long_click: Keyboard_number}

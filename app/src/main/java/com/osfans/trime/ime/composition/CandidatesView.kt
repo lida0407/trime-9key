@@ -115,21 +115,15 @@ class CandidatesView(
         when (it) {
             is RimeMessage.CompositionMessage -> {
                 composition = it.data
+                T9CorrectionState.onComposition(rime, it.data)
                 updateUi()
-                // user backed all the way out of a word they were correcting: go back
-                // to fast T9 typing instead of staying stuck on the letter schema.
-                if (T9CorrectionState.active && composition.length == 0) {
-                    T9CorrectionState.restoreT9Schema(rime)
-                }
             }
             is RimeMessage.CandidateMenuMessage -> {
                 menu = it.data
                 updateUi()
             }
             is RimeMessage.CommitTextMessage -> {
-                if (T9CorrectionState.active) {
-                    T9CorrectionState.restoreT9Schema(rime)
-                }
+                T9CorrectionState.onCommit(rime)
             }
             else -> {}
         }

@@ -138,7 +138,17 @@ class KeyView(
 
         onSwipe = { direction ->
             setPressedState(true)
-            showPopupPreview(direction)
+            if (direction == KeyBehavior.CLICK) {
+                // finger came back under the swipe threshold: releasing now
+                // is a click/long-click again, so drop the gesture preview.
+                dismissPopupPreview()
+            } else {
+                showPopupPreview(direction)
+            }
+        }
+
+        onLongPressEngaged = {
+            showPopupPreview(KeyBehavior.LONG_CLICK)
         }
 
         onSlide = { delta, _, _ ->
@@ -246,7 +256,17 @@ class KeyView(
     }
 
     private fun showPopupPreview(behavior: KeyBehavior = KeyBehavior.CLICK) {
-        if (!keyboardView.popupOnKeyPress) return
+        // trime-9key: the press-preview bubble stays opt-in (popupOnKeyPress),
+        // but gesture feedback -- what a swipe or engaged long press WILL
+        // produce on release -- must always show, or the bindings are
+        // undiscoverable and mid-gesture there's no way to know what letter
+        // or symbol you're about to commit.
+        if (behavior == KeyBehavior.CLICK && !keyboardView.popupOnKeyPress) return
+        if (behavior != KeyBehavior.CLICK && key.getAction(behavior) == null) {
+            // nothing bound in this direction (getPreviewText would NPE)
+            dismissPopupPreview()
+            return
+        }
         key.getPreviewText(behavior).takeIf { it.isNotEmpty() }?.let { previewText ->
             val context = if (previewText.isIconFont) {
                 previewText
