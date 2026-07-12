@@ -1229,7 +1229,7 @@ preset_keyboards:
     #   7PQRS    8TUV   9WXYZ   中|英
     #   全键      符123   空格0    回车
     keys:
-    - {label: '，。？！', click: ',', long_click: '。', popup: ['，', '。', '？', '！', '、', '：', '；'], key_text_size: 16}
+    - {label: '，。？！', click: ',', long_click: '。', swipe_up: '？', swipe_down: '！', popup: ['，', '。', '？', '！', '、', '：', '；'], key_text_size: 16}
     - {label: ABC, click: '2'}
     - {label: DEF, click: '3'}
     - {click: BackSpace, long_click: Escape}
