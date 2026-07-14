@@ -72,7 +72,12 @@ class BoardWindowManager {
 
     fun attachWindow(window: BoardWindow) {
         if (window === currentWindow) {
+            // trime-9key: actually skip. This used to only LOG "skip" and
+            // then fall through to a full detach + re-attach of the same
+            // window -- a whole keyboard view teardown/rebuild on every
+            // schema event, twice, for nothing.
             Timber.d("Skip attaching $window")
+            return
         }
         val newView =
             if (window is ResidentWindow) {

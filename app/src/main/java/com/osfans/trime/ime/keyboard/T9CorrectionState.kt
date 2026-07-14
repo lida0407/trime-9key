@@ -155,11 +155,18 @@ object T9CorrectionState {
         rime: RimeSession,
         corrected: String,
     ) {
+        // Selecting a schema reloads its config and reopens dictionaries
+        // (hundreds of ms with the big dict). Picks after the first in a
+        // session are already on the letter schema -- skip the reload and
+        // just retype. Read before setting `pending`, which would mask it.
+        val alreadyOnLetterSchema = isCorrecting
         pending = true
         active = false
         rime.launchOnReady { api ->
             api.clearComposition()
-            api.selectSchema("luna_pinyin")
+            if (!alreadyOnLetterSchema) {
+                api.selectSchema("luna_pinyin")
+            }
             // multi-syllable preedits carry Rime's display separator (a
             // space); retype it as the apostrophe, the typeable syllable
             // divider, so the boundary survives the round trip.
