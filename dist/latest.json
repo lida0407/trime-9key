@@ -1,6 +1,6 @@
 {
-  "versionName": "v3.3.11-40-g097fc516",
-  "commit": "097fc5168aa5ba114c668e54a1dda09df691af22",
+  "versionName": "v3.3.11-42-g4d8855c7",
+  "commit": "4d8855c73698c921a53cbd4b23da3996854719b2",
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "连续拖选字母组词：h、a、o 全程手势，直接出「好 號 浩…」。\n\n· 现在可以完全用拖选手势打整个词：按住 GHI 原地松手＝h，ABC 左滑＝a，MNO 右滑＝o，编码区依次组成「hao」，候选实时显示 好/號/浩/豪/耗…，点选上屏。\n· 整个过程九宫格盘面保持不动（之前选完第一个字母就切到全键盘，拖选目标直接消失）。\n· 选字母期间误点数字键不会再乱选候选词（自动忽略；退格、空格、候选、标点一切正常）。\n· 点编码区可移动光标，按 Rime 分段显示候选，正常行为。\n· 全部真机验证。\n\nBuild whole words with successive drag-picks on the 9-key grid: hold GHI = h, ABC drag-left = a, MNO drag-right = o -> \"hao\" composing with 好/號/浩... candidates. The 9-key grid stays for the whole session (it used to flip away after the first pick), stray digit taps are ignored mid-session, and everything verified on-device."
+  "notes": "性能优化：整体打字更跟手，连续拖选字母快 20 倍。\n\n· 关掉了 Rime 引擎每次按键刷几十行日志的行为（写日志本身就是打字延迟），真机实测 3 次按键从约 120 行日志降到 0 行。\n· 修复每次方案切换时键盘视图被整个拆掉重建两次的问题（上游代码写了「跳过」日志但没真的跳过）。\n· 拖选字母时，同一个词的第 2、3 个字母不再重新加载方案和词典：实测从约 450 毫秒降到约 20 毫秒（h→ha→hao 全程计时）。\n· 功能全部回归验证：九宫格打字、h/a/o 连续拖选出「好 號 浩…」、选字上屏、回九宫格，一切正常。\n\nPerformance: typing feels snappier overall, successive letter drag-picks are ~20x faster. Silenced librime's per-keystroke INFO log flood (~120 lines per 3 keys -> 0), fixed a full keyboard-view double rebuild on every schema event (upstream logged \"skip\" without skipping), and picks after the first in a session no longer reload the schema/dictionaries (~450ms -> ~20ms measured). All features re-verified on-device."
 }
