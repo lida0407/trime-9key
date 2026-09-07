@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ SPDX-FileCopyrightText: 2015 - 2026 Rime community
+  ~ SPDX-License-Identifier: GPL-3.0-or-later
+  -->
+
+<!--
+  trime-9key: res/xml/method.xml is only referenced from an AndroidManifest
+  meta-data android:resource attribute, which the resource shrinker does not
+  follow, so a minified release build shipped without it. Android then has no
+  input-method metadata to read, refuses to bind the IME service, and silently
+  falls back to another keyboard: the app installs and runs, but cannot be
+  used for typing at all.
+
+  provider_paths.xml is referenced the same way (FileProvider); the updater
+  hands the downloaded APK to the system installer through it.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@xml/method,@xml/method_*,@xml/provider_paths" />

@@ -46,8 +46,29 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // trime-9key: NOT USABLE YET. This variant builds and installs
+            // (signed, own package, own name), but its IME service never puts
+            // a keyboard on screen -- unresolved, and the reason the project
+            // still ships the debug variant. See the minification note below;
+            // turning minification off removes most of the symptoms but not
+            // the last one. The speed this was meant to buy was largely
+            // captured already by the logging and schema-reload fixes.
+            //
+            // this fork ships alongside upstream Trime rather
+            // than replacing it (own app name, own /sdcard/trime9key data
+            // dir), so it needs its own identity too -- the inherited
+            // com.osfans.trime would collide with an installed upstream
+            // build and, signed with a different key, simply refuse to
+            // install.
+            applicationIdSuffix = ".t9"
+            // Minification is OFF on purpose. Trime resolves themes, colors,
+            // key icons and schema assets BY NAME at runtime, so R8 and the
+            // resource shrinker cannot see those references: a minified build
+            // installs and launches, but every runtime lookup returns
+            // "Invalid resource ID 0x00000000" and the keyboard never appears.
+            // Making it work needs real keep-rule engineering, not a flag.
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -62,7 +83,9 @@ android {
                     }
                 }
 
-            resValue("string", "trime_app_name", "@string/app_name_release")
+            // this fork is Trime9Key in both variants; the inherited
+            // release name "Trime" would be indistinguishable from upstream.
+            resValue("string", "trime_app_name", "@string/app_name_debug")
         }
         debug {
             applicationIdSuffix = ".debug"

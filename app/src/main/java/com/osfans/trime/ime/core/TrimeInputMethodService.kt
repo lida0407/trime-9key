@@ -536,6 +536,12 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest? {
         if (!inlineSuggestions || !inputDeviceManager.isVirtualKeyboard) return null
+        // trime-9key: the request is built from theme colors, but the system
+        // asks for it during doStartInput -- which on a fresh install can
+        // happen before any theme is loaded, and the resulting exception
+        // kills the whole IME the first time the user taps a text field.
+        // Skipping inline suggestions for that one call is harmless.
+        if (!ColorManager.isReady) return null
         return InlineSuggestions.createRequest(this)
     }
 

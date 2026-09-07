@@ -37,6 +37,15 @@ object ColorManager {
 
     private lateinit var _activeColorScheme: ColorScheme
 
+    /**
+     * trime-9key: whether a color scheme has been loaded yet. The system can
+     * call into the IME (e.g. onCreateInlineSuggestionsRequest during
+     * doStartInput) before the theme is applied -- on a fresh install that
+     * reached `getColor` on an uninitialized lateinit and took the whole
+     * keyboard down with a StartupException.
+     */
+    val isReady: Boolean get() = this::_activeColorScheme.isInitialized
+
     var activeColorScheme: ColorScheme
         get() = _activeColorScheme
         private set(value) {
