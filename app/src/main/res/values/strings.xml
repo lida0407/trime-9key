@@ -29,6 +29,9 @@
     <string name="update__skip_version">Skip this version</string>
     <string name="update__auto_check">Check on launch</string>
     <string name="update__auto_check_summary">Tell me when a newer build is published</string>
+    <string name="keyboard_cat_layout">Layout</string>
+    <string name="keyboard_cat_feedback">Feedback</string>
+    <string name="keyboard_cat_gestures">Gestures</string>
     <string name="a11y__hold_for">hold for %1$s</string>
     <string name="a11y__swipe_left_for">swipe left for %1$s</string>
     <string name="a11y__swipe_right_for">swipe right for %1$s</string>

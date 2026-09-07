@@ -872,7 +872,7 @@ preset_keys:
   VOLUME_UP: {label: 音量+, send: VOLUME_UP}
   VOLUME_MUTE: {label: 靜音, send: VOLUME_MUTE}
   # 編輯
-  Shift_L: {label: Shift, send: Shift_L, shift_lock: ascii_long}
+  Shift_L: {label: Shift, send: Shift_L, shift_lock: long}
   Return: {label: enter_labels, send: Return}
   Return1: {label: Enter, send: Return }
   Return2: {label: 回车, send: Return }
@@ -926,6 +926,12 @@ preset_keys:
   # （见 KeyboardWindow.smartMatchKeyboard：布局 id 等于方案 id 时自动选用）。
   switch_to_t9: {label: 九宫格, send: function, command: select_schema, option: t9_pinyin}
   switch_to_qwerty: {label: 全键, send: function, command: select_schema, option: luna_pinyin}
+  # trime-9key: the single mode key. Cycles 九宫格 -> 全键拼音 -> 英文 -> 九宫格
+  # (see CommonKeyboardActionListener "cycle_input_mode"). The label names the
+  # mode you'll switch TO. On the qwerty grid it follows ascii_mode: pinyin
+  # shows 英文 (next), english shows 九宫格 (next).
+  cycle_mode_t9: {label: 全键, send: function, command: cycle_input_mode}
+  cycle_mode_qwerty: {toggle: ascii_mode, states: [英文, 九宫格], send: function, command: cycle_input_mode}
   # trime-9key：九宫格精确选字母。在数字键上按住/滑动选出该键上的具体字母
   # （如 GHI 键：左滑=g、长按原地松手=h、右滑=i），用于重码消歧（hao→gao）。
   # 处理逻辑见 CommonKeyboardActionListener 的 t9_pick_letter 命令。
@@ -1051,9 +1057,9 @@ preset_keyboards:
       - {click: ',', long_click: '<'}
       - {click: '.', long_click: '>'}
       - {click: '/', long_click: '?'}
-      - {click: Shift_L, long_click: switch_to_t9}
+      - {click: Shift_L}
       - {click: Keyboard_symbols, long_click: Keyboard_number}
-      - {click: Mode_switch, long_click: Menu, swipe_up: switch_to_t9}
+      - {click: cycle_mode_qwerty, long_click: Menu}
       - {click: space, width: 30}
       - {click: "'", long_click: '"'}
       - {click: BackSpace, width: 15}
@@ -1141,7 +1147,7 @@ preset_keyboards:
     - {click: 'n', long_click: '"'}
     - {click: 'm', long_click: "MoeDict"}
     - {click: BackSpace, width: 15}
-    - {click: Mode_switch, long_click: Menu, width: 15}
+    - {click: cycle_mode_qwerty, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
     - {click: space, width: 30}
@@ -1230,7 +1236,7 @@ preset_keyboards:
     - {click: 'k', long_click: ':'}
     - {click: 'l', long_click: ';'}
     - {width: 5}
-    - {click: Shift_L, send_bindings: false, width: 15, long_click: switch_to_t9}
+    - {click: Shift_L, send_bindings: false, width: 15}
     - {click: 'z', long_click: '`'}
     - {click: 'x', long_click: cut}
     - {click: 'c', long_click: copy}
@@ -1280,9 +1286,9 @@ preset_keyboards:
     - {label: PQRS, click: '7', swipe_left: t9_pick_p, swipe_up: t9_pick_q, long_click: t9_pick_r, swipe_right: t9_pick_s}
     - {label: TUV, click: '8', swipe_left: t9_pick_t, long_click: t9_pick_u, swipe_right: t9_pick_v}
     - {label: WXYZ, click: '9', swipe_left: t9_pick_w, swipe_up: t9_pick_x, long_click: t9_pick_y, swipe_right: t9_pick_z}
-    - {click: Mode_switch}
-    - {click: switch_to_qwerty, label: 全键}
-    - {click: Keyboard_symbols, label: 符, long_click: Keyboard_number}
+    - {click: cycle_mode_t9}
+    - {click: Keyboard_number, label: 数字}
+    - {click: Keyboard_symbols, label: 符}
     - {click: space, label: 空格, hint: '0'}
     - {click: Return, composing: Return1, long_click: CommitComment}
   us_intl:

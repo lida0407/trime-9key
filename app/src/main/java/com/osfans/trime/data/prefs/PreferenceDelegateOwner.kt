@@ -65,12 +65,13 @@ abstract class PreferenceDelegateOwner(
         defaultValue: String,
         @StringRes
         summary: Int? = null,
+        hidden: Boolean = false,
         enableUiOn: (() -> Boolean)? = null,
     ): PreferenceDelegate<String> {
         val pref = PreferenceDelegate(sharedPreferences, key, defaultValue)
         val ui = PreferenceDelegateUi.StringLike(title, key, defaultValue, summary, enableUiOn)
         pref.register()
-        ui.registerUi()
+        if (!hidden) ui.registerUi()
         return pref
     }
 
@@ -81,12 +82,13 @@ abstract class PreferenceDelegateOwner(
         defaultValue: Boolean,
         @StringRes
         summary: Int? = null,
+        hidden: Boolean = false,
         enableUiOn: (() -> Boolean)? = null,
     ): PreferenceDelegate<Boolean> {
         val pref = PreferenceDelegate(sharedPreferences, key, defaultValue)
         val ui = PreferenceDelegateUi.Switch(title, key, defaultValue, summary, enableUiOn)
         pref.register()
-        ui.registerUi()
+        if (!hidden) ui.registerUi()
         return pref
     }
 
@@ -99,12 +101,13 @@ abstract class PreferenceDelegateOwner(
         entryValues: List<T>,
         @StringRes
         entryLabels: List<Int>,
+        hidden: Boolean = false,
         enableUiOn: (() -> Boolean)? = null,
     ): PreferenceDelegate.SerializableDelegate<T> {
         val pref = PreferenceDelegate.SerializableDelegate(sharedPreferences, key, defaultValue, serializer)
         val ui = PreferenceDelegateUi.StringList(title, key, defaultValue, serializer, entryValues, entryLabels, enableUiOn)
         pref.register()
-        ui.registerUi()
+        if (!hidden) ui.registerUi()
         return pref
     }
 
@@ -129,6 +132,7 @@ abstract class PreferenceDelegateOwner(
         @StringRes title: Int,
         key: String,
         defaultValue: T,
+        hidden: Boolean = false,
         noinline enableUiOn: (() -> Boolean)? = null,
     ): PreferenceDelegate.SerializableDelegate<T> where T : Enum<T>, T : PreferenceDelegateEnum {
         val serializer =
@@ -139,7 +143,7 @@ abstract class PreferenceDelegateOwner(
             }
         val entryValues = enumValues<T>().toList()
         val entryLabels = entryValues.map { it.stringRes }
-        return list(title, key, defaultValue, serializer, entryValues, entryLabels, enableUiOn)
+        return list(title, key, defaultValue, serializer, entryValues, entryLabels, hidden = hidden, enableUiOn = enableUiOn)
     }
 
     protected fun editText(
@@ -170,6 +174,7 @@ abstract class PreferenceDelegateOwner(
         @StringRes
         defaultLabel: Int? = null,
         useMinAsDefault: Boolean = false,
+        hidden: Boolean = false,
         enableUiOn: (() -> Boolean)? = null,
     ): PreferenceDelegate<Int> {
         val pref = PreferenceDelegate(sharedPreferences, key, defaultValue)
@@ -190,18 +195,26 @@ abstract class PreferenceDelegateOwner(
             )
         }
         pref.register()
-        ui.registerUi()
+        if (!hidden) ui.registerUi()
         return pref
+    }
+
+    /** trime-9key: a heading; the preferences declared after it are grouped under it. */
+    protected fun category(@StringRes title: Int) {
+        PreferenceDelegateUi.Category(title).registerUi()
     }
 
     override fun createUi(screen: PreferenceScreen) {
         val ctx = screen.context
+        var group: androidx.preference.PreferenceGroup = screen
         preferenceDelegatesUi.forEach {
-            screen.addPreference(
-                it.createUi(ctx).apply {
-                    isEnabled = it.isEnabled()
-                },
-            )
+            val pref = it.createUi(ctx).apply { isEnabled = it.isEnabled() }
+            if (it is PreferenceDelegateUi.Category) {
+                screen.addPreference(pref)
+                group = pref as androidx.preference.PreferenceGroup
+            } else {
+                group.addPreference(pref)
+            }
         }
     }
 }

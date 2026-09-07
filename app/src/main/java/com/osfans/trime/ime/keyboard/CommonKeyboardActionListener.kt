@@ -217,7 +217,32 @@ class CommonKeyboardActionListener {
                     "select_candidate" -> handleSelectCandidate(arg)
                     "select_schema" -> handleSelectSchema(arg)
                     "t9_pick_letter" -> handlePickLetter(arg)
+                    "cycle_input_mode" -> handleCycleInputMode()
                     else -> handleIntentAction(action.command, arg)
+                }
+            }
+
+            // trime-9key: the one mode key. 九宫格 -> 全键拼音 -> 英文 -> 九宫格.
+            // Replaces three separate controls (中文/西文 toggle, 全键/九宫格
+            // schema keys, Shift-hold for English) that could combine into
+            // nonsense states like English mode on the 9-key grid.
+            private fun handleCycleInputMode() {
+                T9CorrectionState.reset()
+                rime.launchOnReady { api ->
+                    service.lifecycleScope.launch {
+                        val status = api.statusCached
+                        when {
+                            status.schemaId == T9CorrectionState.T9_SCHEMA -> {
+                                api.setRuntimeOption("ascii_mode", false)
+                                api.selectSchema(T9CorrectionState.letterSchemaId)
+                            }
+                            !status.isAsciiMode -> api.setRuntimeOption("ascii_mode", true)
+                            else -> {
+                                api.setRuntimeOption("ascii_mode", false)
+                                api.selectSchema(T9CorrectionState.T9_SCHEMA)
+                            }
+                        }
+                    }
                 }
             }
 

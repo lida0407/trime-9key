@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreference
 import com.osfans.trime.ui.main.settings.DialogSeekBarPreference
 import com.osfans.trime.ui.main.settings.EditTextIntPreference
@@ -20,6 +21,18 @@ abstract class PreferenceDelegateUi<T : Preference>(
     abstract fun createUi(context: Context): T
 
     fun isEnabled() = enableUiOn?.invoke() ?: true
+
+    /** trime-9key: a section heading in a settings screen. */
+    class Category(
+        @StringRes
+        val title: Int,
+    ) : PreferenceDelegateUi<PreferenceCategory>("category_$title") {
+        override fun createUi(context: Context) = PreferenceCategory(context).apply {
+            key = this@Category.key
+            isIconSpaceReserved = false
+            setTitle(this@Category.title)
+        }
+    }
 
     class StringLike(
         @StringRes

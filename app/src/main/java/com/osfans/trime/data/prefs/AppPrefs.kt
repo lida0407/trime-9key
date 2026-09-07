@@ -158,9 +158,9 @@ class AppPrefs(
             const val HOOK_SHIFT_SYMBOL = "hook_shift_symbol"
             const val HOOK_SHIFT_ARROW = "hook_shift_arrow"
 
+            const val HORIZONTAL_CANDIDATE_MODE = "horizontal_candidate_mode"
             const val MAX_SPAN_COUNT = "max_span_count"
             const val MAX_SPAN_COUNT_LANDSCAPE = "max_span_count_landscape"
-            const val HORIZONTAL_CANDIDATE_MODE = "horizontal_candidate_mode"
         }
 
         enum class LandscapeMode(override val stringRes: Int) : PreferenceDelegateEnum {
@@ -170,7 +170,7 @@ class AppPrefs(
             ALWAYS(R.string.always),
         }
 
-        val landscapeMode = enum(R.string.enable_landscape_mode, LANDSCAPE_MODE, LandscapeMode.NEVER)
+        val landscapeMode = enum(R.string.enable_landscape_mode, LANDSCAPE_MODE, LandscapeMode.NEVER, hidden = true)
         val splitSpacePercent = int(
             R.string.split_space_percent,
             SPLIT_SPACE_PERCENT,
@@ -178,12 +178,15 @@ class AppPrefs(
             0,
             200,
             "%",
+            hidden = true,
         )
 
-        val useSoftCursor = switch(R.string.use_soft_cursor, USE_SOFT_CURSOR, true)
+        val useSoftCursor = switch(R.string.use_soft_cursor, USE_SOFT_CURSOR, true, hidden = true)
 
+        init { category(R.string.keyboard_cat_layout) }
         val hideInputBar = switch(R.string.hide_input_bar, HIDE_INPUT_BAR, false)
 
+        init { category(R.string.keyboard_cat_feedback) }
         val soundOnKeyPress = switch(R.string.sound_on_keypress, SOUND_ON_KEYPRESS, false)
         val soundVolume = int(
             R.string.sound_volume,
@@ -199,11 +202,13 @@ class AppPrefs(
             R.string.custom_sound_effect_enabled,
             USE_CUSTOM_SOUND_EFFECT,
             false,
+            hidden = true,
         ) { soundOnKeyPress.getValue() }
         val customSoundEffect = string(
             R.string.custom_sound_effect_name,
             CUSTOM_SOUND_EFFECT,
             "",
+            hidden = true,
         ) { soundOnKeyPress.getValue() && useCustomSoundEffect.getValue() }
 
         val vibrateOnKeyPress = switch(R.string.vibrate_on_key_press, VIBRATE_ON_KEY_PRESS, false)
@@ -211,12 +216,14 @@ class AppPrefs(
             R.string.vibrate_on_key_release,
             VIBRATE_ON_KEY_RELEASE,
             false,
+            hidden = true,
         ) { vibrateOnKeyPress.getValue() }
 
         val vibrateOnKeyRepeat = switch(
             R.string.vibrate_on_key_repeat,
             VIBRATE_ON_KEY_REPEAT,
             false,
+            hidden = true,
         ) { vibrateOnKeyPress.getValue() }
 
         val vibrationDuration = int(
@@ -236,17 +243,19 @@ class AppPrefs(
             0,
             255,
             defaultLabel = R.string.system_default,
+            hidden = true,
         ) { vibrateOnKeyPress.getValue() }
 
-        val speakOnKeyPress = switch(R.string.speak_on_keypress, SPEAK_ON_KEYPRESS, false)
-        val speakOnCommit = switch(R.string.speak_on_commit, SPEAK_ON_COMMIT, false)
+        val speakOnKeyPress = switch(R.string.speak_on_keypress, SPEAK_ON_KEYPRESS, false, hidden = true)
+        val speakOnCommit = switch(R.string.speak_on_commit, SPEAK_ON_COMMIT, false, hidden = true)
         val popupOnKeyPress = switch(R.string.popup_on_key_press, POPUP_ON_KEY_PRESS, false)
-        val expandKeypressArea = switch(R.string.expand_keypress_area_to_edge, EXPAND_KEYPRESS_AREA, false)
+        val expandKeypressArea = switch(R.string.expand_keypress_area_to_edge, EXPAND_KEYPRESS_AREA, false, hidden = true)
         // trime-9key: this is now genuinely interpreted as dp (GestureFrame
         // used to compare it against raw pixels). 24dp keeps the travel that
         // the old 60-"dp"-but-really-px default produced on a ~420dpi phone,
         // so the feel is unchanged where it was tuned -- but it is now the
         // same physical distance on every screen density.
+        init { category(R.string.keyboard_cat_gestures) }
         val swipeTravel = int(
             R.string.key_swipe_travel,
             SWIPE_TRAVEL,
@@ -268,6 +277,7 @@ class AppPrefs(
             "dp/s",
             100,
             R.string.disable,
+            hidden = true,
         )
 
         val longPressTimeout = int(
@@ -288,6 +298,7 @@ class AppPrefs(
             100,
             "ms",
             10,
+            hidden = true,
         )
 
         val doubleTapTimeout = int(
@@ -298,6 +309,7 @@ class AppPrefs(
             1000,
             "ms",
             10,
+            hidden = true,
         )
 
         val slideStepSize = int(
@@ -307,42 +319,23 @@ class AppPrefs(
             1,
             100,
             "dp",
+            hidden = true,
         )
 
-        val horizontalCandidateMode = enum(R.string.horizontal_candidate_style, HORIZONTAL_CANDIDATE_MODE, CompactCandidateMode.NEVER_FILL)
+        val horizontalCandidateMode = enum(R.string.horizontal_candidate_style, HORIZONTAL_CANDIDATE_MODE, CompactCandidateMode.NEVER_FILL, hidden = true)
 
-        val maxSpanCount = int(
-            R.string.max_span_count,
-            MAX_SPAN_COUNT,
-            6,
-            1,
-            10,
-            enableUiOn = {
-                shared.getString(HORIZONTAL_CANDIDATE_MODE, null) ==
-                    CompactCandidateMode.AUTO_FILL.name
-            },
-        )
+        // read by CompactCandidateDelegate; not worth a user-facing knob
+        val maxSpanCount = int(R.string.max_span_count, MAX_SPAN_COUNT, 6, 1, 20, hidden = true)
+        val maxSpanCountLandscape = int(R.string.max_span_count_landscape, MAX_SPAN_COUNT_LANDSCAPE, 8, 1, 30, hidden = true)
 
-        val maxSpanCountLandscape = int(
-            R.string.max_span_count_landscape,
-            MAX_SPAN_COUNT_LANDSCAPE,
-            8,
-            4,
-            12,
-            enableUiOn = {
-                shared.getString(HORIZONTAL_CANDIDATE_MODE, null) ==
-                    CompactCandidateMode.AUTO_FILL.name
-            },
-        )
-
-        val hookCtrlA = switch(R.string.hook_ctrl_a, HOOK_CTRL_A, false)
-        val hookCtrlCV = switch(R.string.hook_ctrl_cv, HOOK_CTRL_CV, false)
-        val hookCtrlLR = switch(R.string.hook_ctrl_lr, HOOK_CTRL_LR, false)
-        val hookCtrlZY = switch(R.string.hook_ctrl_zy, HOOK_CTRL_ZY, false)
-        val hookShiftSpace = switch(R.string.hook_shift_space, HOOK_SHIFT_SPACE, false)
-        val hookShiftNum = switch(R.string.hook_shift_num, HOOK_SHIFT_NUM, false)
-        val hookShiftSymbol = switch(R.string.hook_shift_symbol, HOOK_SHIFT_SYMBOL, false)
-        val hookShiftArrow = switch(R.string.hook_shift_arrow, HOOK_SHIFT_ARROW, true)
+        val hookCtrlA = switch(R.string.hook_ctrl_a, HOOK_CTRL_A, false, hidden = true)
+        val hookCtrlCV = switch(R.string.hook_ctrl_cv, HOOK_CTRL_CV, false, hidden = true)
+        val hookCtrlLR = switch(R.string.hook_ctrl_lr, HOOK_CTRL_LR, false, hidden = true)
+        val hookCtrlZY = switch(R.string.hook_ctrl_zy, HOOK_CTRL_ZY, false, hidden = true)
+        val hookShiftSpace = switch(R.string.hook_shift_space, HOOK_SHIFT_SPACE, false, hidden = true)
+        val hookShiftNum = switch(R.string.hook_shift_num, HOOK_SHIFT_NUM, false, hidden = true)
+        val hookShiftSymbol = switch(R.string.hook_shift_symbol, HOOK_SHIFT_SYMBOL, false, hidden = true)
+        val hookShiftArrow = switch(R.string.hook_shift_arrow, HOOK_SHIFT_ARROW, true, hidden = true)
     }
 
     class Candidates(

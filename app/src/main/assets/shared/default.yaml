@@ -63,10 +63,14 @@ recognizer:
 
 ascii_composer:
   good_old_caps_lock: true
+  # trime-9key: Shift/Caps never toggle English. The only way between
+  # Chinese and English is the one mode key on the keyboard, which cycles
+  # 九宫格 -> 全键拼音 -> 英文. (inline_ascii/commit_text/clear all flip
+  # ascii_mode as a side effect; noop is the only value that doesn't.)
   switch_key:
-    Shift_L: inline_ascii
-    Shift_R: commit_text
+    Shift_L: noop
+    Shift_R: noop
     Control_L: noop
     Control_R: noop
-    Caps_Lock: clear
+    Caps_Lock: noop
     Eisu_toggle: clear
