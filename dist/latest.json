@@ -1,7 +1,7 @@
 {
-  "versionName": "v3.3.11-49-gc4590c34",
-  "commit": "c4590c34d5b5718b2dfcec4f5de9fb472891050b",
-  "buildTimestamp": 1788766943242,
+  "versionName": "v3.3.11-51-g522be83b",
+  "commit": "522be83bd6f3b6f2a0c67d4431a16ded62ca2900",
+  "buildTimestamp": 1788769055895,
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "修复首次安装即闪退的严重问题。\n\n· 新装本输入法后第一次点输入框时，系统会在主题还没加载完就来取「内联建议」，这一步要读主题颜色，于是直接崩溃、整个输入法被系统踢掉——表现就是「装了但用不了，自动跳回别的键盘」。老用户不受影响（主题早已加载），但任何全新安装都会踩到。已修复。\n· 词库评测结论：对比了雾凇（现用）和白霜两套词库，20 个常用词的候选排序完全一致；在真正容易重码的短编码上两者结果有三成不同，但各有胜负（例如「6453」现用词库给「你可/你了」明显更合理），没有可测量的改进，因此维持现用词库不变。\n· Release（精简）版本仍不可用：能编译签名安装，但输入法界面起不来；R8 精简会破坏 Trime 按名字查找主题/图标/资源的机制。原因已记录在构建脚本里，正式版继续沿用当前版本。\n\nFixes a first-run crash: on a brand-new install, the system asked for inline suggestions before any theme was loaded, which killed the IME the first time you tapped a text field (Android then falls back to another keyboard). Existing installs were unaffected. Also: the rime-frost dictionary was measured against the current one and showed no improvement, so it was not adopted; the minified release variant remains unusable and the reason is recorded in the build script."
+  "notes": "一个键切换模式：九宫格 → 全键拼音 → 英文；设置大幅精简。\n\n· 以前有三套互相打架的切换：「中文/西文」开关（能把九宫格切成英文，没有意义）、「全键/九宫格」键、还有长按 Shift 切英文。现在只有一个键，按一下循环：九宫格 → 全键拼音 → 英文 → 九宫格，键上写的永远是「按下去会切到哪个模式」。Shift 只管大小写，不再碰中英文。九宫格上空出来的位置改成了数字键盘。\n· 「虚拟键盘」设置从一长串 36 项精简到 8 项，分成「布局 / 反馈 / 手势」三组。去掉的都是对手机九宫格没意义或重复的：外接键盘 Ctrl/Shift 钩子、按键朗读、滑动速度（和滑动距离重复）、双击/连发/滑步等时间参数、横屏分栏、软光标、自定义音效文件、抬起/连发震动变体、候选列数。它们仍按默认值生效。\n\nOne mode key now cycles 9-key -> qwerty pinyin -> English (label names the next mode); Shift/Caps no longer toggle English. Virtual Keyboard settings trimmed from 36 items to 8 in three groups; removed items keep their defaults."
 }
