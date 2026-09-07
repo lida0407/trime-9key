@@ -1,6 +1,7 @@
 {
-  "versionName": "v3.3.11-42-g4d8855c7",
-  "commit": "4d8855c73698c921a53cbd4b23da3996854719b2",
+  "versionName": "v3.3.11-45-gc00cd654",
+  "commit": "c00cd654a468e835ff53d41c2580dab58b619c0e",
+  "buildTimestamp": 1788762881786,
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "性能优化：整体打字更跟手，连续拖选字母快 20 倍。\n\n· 关掉了 Rime 引擎每次按键刷几十行日志的行为（写日志本身就是打字延迟），真机实测 3 次按键从约 120 行日志降到 0 行。\n· 修复每次方案切换时键盘视图被整个拆掉重建两次的问题（上游代码写了「跳过」日志但没真的跳过）。\n· 拖选字母时，同一个词的第 2、3 个字母不再重新加载方案和词典：实测从约 450 毫秒降到约 20 毫秒（h→ha→hao 全程计时）。\n· 功能全部回归验证：九宫格打字、h/a/o 连续拖选出「好 號 浩…」、选字上屏、回九宫格，一切正常。\n\nPerformance: typing feels snappier overall, successive letter drag-picks are ~20x faster. Silenced librime's per-keystroke INFO log flood (~120 lines per 3 keys -> 0), fixed a full keyboard-view double rebuild on every schema event (upstream logged \"skip\" without skipping), and picks after the first in a session no longer reload the schema/dictionaries (~450ms -> ~20ms measured). All features re-verified on-device."
+  "notes": "修复一批真机确认的 bug：不再降级安装、不再丢按键、不再被切走键盘。\n\n· 更新检查以前只比对 commit 是否不同，于是仓库里的旧版本也会被当成「更新」推给你——点一下就把新版覆盖成旧版（测试中真的发生过）。现在按构建时间排序，只有确实更新的版本才提示。\n· 更新弹窗以前每次开 app 都弹、且无法拒绝。新增「跳过此版本」，以及关于页里的「启动时检查」开关。\n· 快速打字时手指稍微带一点方向、而该键在那个方向没有绑定手势，这一下按键会被完全丢掉、毫无反应。现在按普通点击处理。\n· 手势灵敏度设置写的是 dp，代码却按像素比较，实际阈值随屏幕密度缩水（420dpi 上只有约 23dp）。已改为真正的 dp，默认值调成 24dp 以保持原有手感。\n· 全键盘下在编码区拖动，上屏后会被强行切到九宫格。现在回到你原本所在的方案，且字母循环手势只在九宫格下生效。\n· 输入法被系统杀掉后重启，键盘布局可能和方案对不上（全键盘盖在九宫格方案上，字母键和实际编码无关）。现在开始输入时会自动重新配对。\n· 按键新增无障碍朗读（「GHI，长按 h，左滑 g，右滑 i」）。\n\nFixes verified on-device: the updater no longer offers/installs downgrades (it now orders builds by build time), the update prompt can be skipped or turned off, sloppy fast taps no longer silently drop keystrokes, the gesture threshold is genuinely dp instead of raw pixels, preedit drags on qwerty no longer hijack you to the 9-key grid, a stale layout/schema mismatch after an IME restart is re-paired automatically, and keys now describe themselves to screen readers."
 }
