@@ -353,6 +353,59 @@ class KeyView(
         if (hint.isNotEmpty()) {
             drawSymbol(canvas, hint, isTop = false)
         }
+
+        drawSideGestureHints(canvas)
+    }
+
+    /**
+     * trime-9key: the left/right swipe letters were completely invisible --
+     * only the long-press letter got a hint, so nothing on the key said that
+     * GHI can also give you g or i. Draw them in the bottom corners they
+     * point at, read straight from the key's own bindings so the hint can
+     * never disagree with what the gesture does.
+     *
+     * Only for letters the key itself advertises (GHI -> g, i). A qwerty key
+     * binds its side swipes to brackets and cursor jumps, and hinting all of
+     * those would bury the keyboard in corner text.
+     */
+    private fun drawSideGestureHints(canvas: Canvas) {
+        if (rime.run { getRuntimeOption("_hide_key_symbol") }) return
+        val face = key.getLabel()
+        if (face.length < 2) return
+        fun letterHint(behavior: KeyBehavior): String = key
+            .getAction(behavior)
+            ?.getLabel(keyboard)
+            .orEmpty()
+            .takeIf { it.length == 1 && face.contains(it, ignoreCase = true) }
+            .orEmpty()
+        val left = letterHint(KeyBehavior.SWIPE_LEFT)
+        val right = letterHint(KeyBehavior.SWIPE_RIGHT)
+        if (left.isEmpty() && right.isEmpty()) return
+
+        symbolPaint.apply {
+            color = key.getSymbolColor()
+            textSize = sp(key.symbolTextSize.takeIf { it > 0f } ?: keyboardView.symbolTextSize)
+            typeface = FontManager.getTypeface("symbol_font")
+            alpha = SIDE_HINT_ALPHA
+        }
+        // On the label's own line, not the key's bottom edge: down there the
+        // hints of adjacent keys ("i" of GHI beside "j" of JKL) sit closer to
+        // each other than to the key they describe, and read as a pair.
+        val fm = symbolPaint.fontMetrics
+        val centerY = (height - paddingTop - paddingBottom) / 2f + paddingTop
+        val baseline = centerY - (fm.ascent + fm.descent) / 2f
+        val inset = sp(SIDE_HINT_INSET_SP)
+        if (left.isNotEmpty()) {
+            symbolPaint.textAlign = Paint.Align.LEFT
+            canvas.drawText(left, paddingLeft + inset, baseline, symbolPaint)
+        }
+        if (right.isNotEmpty()) {
+            symbolPaint.textAlign = Paint.Align.RIGHT
+            canvas.drawText(right, width - paddingRight - inset, baseline, symbolPaint)
+        }
+        // shared paint: restore what the other draw helpers expect
+        symbolPaint.textAlign = Paint.Align.CENTER
+        symbolPaint.alpha = 255
     }
 
     private fun drawBackground(canvas: Canvas, k: Key) {
@@ -475,5 +528,11 @@ class KeyView(
                 canvas.drawText(lines[i], centerX, lineY, symbolPaint)
             }
         }
+    }
+
+    companion object {
+        /** Corner hints stay quieter than the key's own label. */
+        private const val SIDE_HINT_ALPHA = 150
+        private const val SIDE_HINT_INSET_SP = 3f
     }
 }

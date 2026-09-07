@@ -70,6 +70,16 @@ open class PreeditUi(
         visibility = if (visible) View.VISIBLE else View.GONE
     }
 
+    /**
+     * trime-9key: show plain text without waiting for the engine, so the
+     * first letter-pick of a word (which loads a schema) gives immediate
+     * feedback. The next real composition overwrites it.
+     */
+    fun updateText(text: String) {
+        visible = text.isNotEmpty()
+        updateTextView(text, visible)
+    }
+
     fun update(composition: CompositionProto) {
         val string = composition.toSpannedString()
         val cursorPos = composition.cursorPos

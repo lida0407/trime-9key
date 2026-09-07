@@ -72,6 +72,20 @@ class PreeditDelegate : InputBroadcastReceiver {
 
     private val touchEventReceiverWindow = TouchEventReceiverWindow(ui.root)
 
+    init {
+        // Optimistic echo for the first letter-pick of a word, which waits on
+        // a schema load. Runs on the main thread: the pick is dispatched from
+        // a key touch, but the flag it reads is @Volatile and could in
+        // principle be set elsewhere.
+        T9CorrectionState.pendingPreview = { text ->
+            ui.root.post {
+                ui.updateText(text)
+                ui.root.visibility = View.VISIBLE
+                touchEventReceiverWindow.show()
+            }
+        }
+    }
+
     override fun onCompositionUpdate(data: CompositionProto) {
         composition = data
         T9CorrectionState.onComposition(rime, data)

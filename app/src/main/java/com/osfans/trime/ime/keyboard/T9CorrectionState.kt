@@ -63,6 +63,13 @@ object T9CorrectionState {
     @Volatile
     var lastComposition: CompositionProto = CompositionProto()
 
+    /**
+     * Renders optimistic preedit text while the engine catches up. Set by
+     * the preedit view; the real composition overwrites it moments later.
+     */
+    @Volatile
+    var pendingPreview: ((String) -> Unit)? = null
+
     /** The schema the user was actually typing in when the correction
      * started, restored when it ends. Hardcoding `t9_pinyin` here dumped
      * qwerty users onto the 9-key grid after any preedit correction. */
@@ -203,6 +210,13 @@ object T9CorrectionState {
         }
         pending = true
         active = false
+        // The first pick of a word has to load the letter schema, which takes
+        // long enough (~450ms, dictionaries reopen) that the gesture looks
+        // like it did nothing. Show the text it will produce immediately;
+        // the engine's own composition replaces this as soon as it lands.
+        if (!alreadyOnLetterSchema) {
+            pendingPreview?.invoke(corrected)
+        }
         rime.launchOnReady { api ->
             api.clearComposition()
             if (!alreadyOnLetterSchema) {
