@@ -237,6 +237,19 @@ class KeyboardWindow :
                     }
                 }
             }
+        // trime-9key: an ordinary text field ("") keeps whatever layout was
+        // last locked, which after an IME restart can disagree with the
+        // schema the engine actually reloaded -- e.g. the qwerty grid over
+        // the 9-key schema, where the letter keys don't match the codes
+        // being typed. Re-pair them when the schema owns a layout of its own.
+        val schemaId = rime.run { statusCached }.schemaId
+        if (targetKeyboard.isEmpty() &&
+            presetKeyboardIds.contains(schemaId) &&
+            currentKeyboardId != schemaId
+        ) {
+            switchKeyboard(schemaId)
+            return
+        }
         switchKeyboard(targetKeyboard)
         val isAsciiMode = rime.run { statusCached }.isAsciiMode
         if (targetKeyboard == ".ascii" || targetKeyboard == "number") {
