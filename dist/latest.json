@@ -1,7 +1,7 @@
 {
-  "versionName": "v3.3.11-45-gc00cd654",
-  "commit": "c00cd654a468e835ff53d41c2580dab58b619c0e",
-  "buildTimestamp": 1788762881786,
+  "versionName": "v3.3.11-47-gaa5f7815",
+  "commit": "aa5f7815c9d1d62cf8512f3140ce9308481145b5",
+  "buildTimestamp": 1788764354385,
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "修复一批真机确认的 bug：不再降级安装、不再丢按键、不再被切走键盘。\n\n· 更新检查以前只比对 commit 是否不同，于是仓库里的旧版本也会被当成「更新」推给你——点一下就把新版覆盖成旧版（测试中真的发生过）。现在按构建时间排序，只有确实更新的版本才提示。\n· 更新弹窗以前每次开 app 都弹、且无法拒绝。新增「跳过此版本」，以及关于页里的「启动时检查」开关。\n· 快速打字时手指稍微带一点方向、而该键在那个方向没有绑定手势，这一下按键会被完全丢掉、毫无反应。现在按普通点击处理。\n· 手势灵敏度设置写的是 dp，代码却按像素比较，实际阈值随屏幕密度缩水（420dpi 上只有约 23dp）。已改为真正的 dp，默认值调成 24dp 以保持原有手感。\n· 全键盘下在编码区拖动，上屏后会被强行切到九宫格。现在回到你原本所在的方案，且字母循环手势只在九宫格下生效。\n· 输入法被系统杀掉后重启，键盘布局可能和方案对不上（全键盘盖在九宫格方案上，字母键和实际编码无关）。现在开始输入时会自动重新配对。\n· 按键新增无障碍朗读（「GHI，长按 h，左滑 g，右滑 i」）。\n\nFixes verified on-device: the updater no longer offers/installs downgrades (it now orders builds by build time), the update prompt can be skipped or turned off, sloppy fast taps no longer silently drop keystrokes, the gesture threshold is genuinely dp instead of raw pixels, preedit drags on qwerty no longer hijack you to the 9-key grid, a stale layout/schema mismatch after an IME restart is re-paired automatically, and keys now describe themselves to screen readers."
+  "notes": "九宫格手势看得见了：键面直接标出左滑/右滑的字母。\n\n· 每个字母键现在在标签两侧标出左滑和右滑对应的字母（如「g GHI i」，上方仍是长按的 h），键面即说明书，不用再猜哪个方向出哪个字母。这些提示直接读取按键的真实绑定，不会和实际行为对不上；全键盘下不显示（那里的左右滑是括号和光标跳转，标出来只会糊满屏幕）。\n· 编码区轻点不再乱跳光标：以前手指碰一下编码区就把光标插进词中间，候选变成分段的（「hao」变成「h|ao」出「哈」），而且没有明显的退路——编码区又被放大成了指尖大小，伸手点候选很容易误触。现在只有明确的长按才移动光标，拖动改字母不受影响。\n· 每个词的第一次拖选字母以前要等约 450 毫秒（后台在加载方案），期间毫无反应、像是没生效。现在立刻显示选中的字母，引擎跟上后再替换。\n\nThe T9 gestures are now visible on the keys themselves (\"g GHI i\", with the hold letter above), read from the real bindings and shown only where they help. A stray tap on the preedit no longer drags the caret into the middle of the word and re-segments the candidates -- that now takes a deliberate hold. And the first letter-pick of a word echoes immediately instead of sitting silent while the schema loads."
 }
