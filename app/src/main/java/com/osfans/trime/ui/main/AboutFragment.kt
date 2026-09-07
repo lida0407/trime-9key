@@ -11,12 +11,14 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
+import androidx.preference.SwitchPreferenceCompat
 import com.osfans.trime.BuildConfig
 import com.osfans.trime.R
 import com.osfans.trime.ui.common.PaddingPreferenceFragment
 import com.osfans.trime.util.Const
 import com.osfans.trime.util.addCategory
 import com.osfans.trime.util.addPreference
+import com.osfans.trime.util.UpdateManager
 import com.osfans.trime.util.checkForUpdate
 import com.osfans.trime.util.formatDateTime
 
@@ -39,6 +41,21 @@ class AboutFragment : PaddingPreferenceFragment() {
             addPreference(R.string.update__check, R.string.update__check_summary) {
                 requireActivity().checkForUpdate(silent = false)
             }
+            // Lets the user stop the launch-time prompt entirely, without
+            // having to skip each version as it appears.
+            addPreference(
+                SwitchPreferenceCompat(context).apply {
+                    isSingleLineTitle = false
+                    isIconSpaceReserved = false
+                    setTitle(R.string.update__auto_check)
+                    setSummary(R.string.update__auto_check_summary)
+                    isChecked = UpdateManager.isAutoCheckEnabled(context)
+                    setOnPreferenceChangeListener { _, newValue ->
+                        UpdateManager.setAutoCheckEnabled(context, newValue as Boolean)
+                        true
+                    }
+                },
+            )
             addPreference(R.string.librime_version, BuildConfig.LIBRIME_VERSION) {
                 val hash = getCommitFromVersionName(BuildConfig.LIBRIME_VERSION)
                 startActivity(

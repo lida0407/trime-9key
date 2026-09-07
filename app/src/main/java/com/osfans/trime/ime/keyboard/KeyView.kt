@@ -14,10 +14,12 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.view.KeyEvent
+import androidx.annotation.StringRes
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.sizeDp
 import com.osfans.trime.daemon.RimeDaemon
 import com.osfans.trime.data.prefs.AppPrefs
+import com.osfans.trime.R
 import com.osfans.trime.data.theme.ColorManager
 import com.osfans.trime.data.theme.FontManager
 import com.osfans.trime.ime.core.TrimeInputMethodService
@@ -87,6 +89,10 @@ class KeyView(
         hasDouble = key.hasAction(KeyBehavior.DOUBLE_CLICK)
         hasLazyDouble = key.hasAction(KeyBehavior.LAZY_DOUBLE_CLICK)
         hasPopup = key.popup.isNotEmpty()
+        // trime-9key: keys draw themselves on a bare view, so a screen reader
+        // otherwise announces nothing at all -- and the gesture bindings
+        // (swipe/hold letters, punctuation) are invisible to it entirely.
+        contentDescription = buildAccessibilityLabel()
 
         onPress = {
             if (keyboard.firstPressedKeyIndex == -1) keyboard.firstPressedKeyIndex = id
@@ -123,8 +129,18 @@ class KeyView(
                         val actionBehavior = if (pressedIdx != -1 && pressedIdx != id) KeyBehavior.COMBO else behavior
                         key.getAction(actionBehavior)?.let { processKeyAction(it, actionBehavior) }
                     }
-                    KeyBehavior.DOUBLE_CLICK, KeyBehavior.LAZY_DOUBLE_CLICK,
                     KeyBehavior.SWIPE_UP, KeyBehavior.SWIPE_DOWN, KeyBehavior.SWIPE_LEFT, KeyBehavior.SWIPE_RIGHT,
+                    -> {
+                        // trime-9key: a fast tap that drifts past the swipe
+                        // threshold in a direction this key doesn't bind used
+                        // to dispatch nothing at all -- the keystroke silently
+                        // vanished. Fall back to the key's normal click, which
+                        // is what such a sloppy tap meant.
+                        val action = key.getAction(behavior) ?: key.getAction(KeyBehavior.CLICK)
+                        val effective = if (key.getAction(behavior) != null) behavior else KeyBehavior.CLICK
+                        action?.let { processKeyAction(it, effective) }
+                    }
+                    KeyBehavior.DOUBLE_CLICK, KeyBehavior.LAZY_DOUBLE_CLICK,
                     ->
                         key.getAction(behavior)?.let { processKeyAction(it, behavior) }
                     else -> {}
@@ -201,6 +217,22 @@ class KeyView(
             setPressedState(false)
             dismissPopupPreview()
         }
+    }
+
+    /** "GHI, hold for h, swipe left for g, swipe right for i". */
+    private fun buildAccessibilityLabel(): String {
+        val parts = mutableListOf<String>()
+        key.getLabel().takeIf { it.isNotBlank() }?.let { parts.add(it) }
+        fun describe(behavior: KeyBehavior, @StringRes template: Int) {
+            val label = key.getAction(behavior)?.getLabel(keyboard).orEmpty()
+            if (label.isNotBlank()) parts.add(context.getString(template, label))
+        }
+        describe(KeyBehavior.LONG_CLICK, R.string.a11y__hold_for)
+        describe(KeyBehavior.SWIPE_LEFT, R.string.a11y__swipe_left_for)
+        describe(KeyBehavior.SWIPE_RIGHT, R.string.a11y__swipe_right_for)
+        describe(KeyBehavior.SWIPE_UP, R.string.a11y__swipe_up_for)
+        describe(KeyBehavior.SWIPE_DOWN, R.string.a11y__swipe_down_for)
+        return parts.joinToString(", ")
     }
 
     fun setPressedState(pressed: Boolean) {

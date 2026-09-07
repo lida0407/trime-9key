@@ -63,6 +63,34 @@ object T9CorrectionState {
     @Volatile
     var lastComposition: CompositionProto = CompositionProto()
 
+    /** The schema the user was actually typing in when the correction
+     * started, restored when it ends. Hardcoding `t9_pinyin` here dumped
+     * qwerty users onto the 9-key grid after any preedit correction. */
+    @Volatile
+    private var originSchema: String = T9_SCHEMA
+
+    /** Schema this feature's key-side gestures belong to. */
+    const val T9_SCHEMA = "t9_pinyin"
+
+    /** The plain-letter schema corrections compose in. */
+    private const val LETTER_SCHEMA = "luna_pinyin"
+
+    /** Exposed so the keyboard can tell an internal correction swap apart
+     * from a schema change the user actually asked for. */
+    val letterSchemaId: String get() = LETTER_SCHEMA
+
+    /**
+     * Forget any in-flight correction. Called when the IME (re)starts on a
+     * field: the process may have been killed mid-session, leaving these
+     * flags disagreeing with the engine's actual schema and the visible
+     * keyboard.
+     */
+    fun reset() {
+        active = false
+        pending = false
+        lastComposition = CompositionProto()
+    }
+
     /** Both preedit views funnel every composition update here. */
     fun onComposition(
         rime: RimeSession,
@@ -79,14 +107,14 @@ object T9CorrectionState {
         // user backed all the way out of the word they were correcting: go
         // back to fast T9 typing instead of staying on the letter schema.
         if (active && data.length == 0) {
-            restoreT9Schema(rime)
+            restoreOriginSchema(rime)
         }
     }
 
     /** Committing anything while correcting ends the correction. */
     fun onCommit(rime: RimeSession) {
         if (active) {
-            restoreT9Schema(rime)
+            restoreOriginSchema(rime)
         }
     }
 
@@ -105,6 +133,10 @@ object T9CorrectionState {
         offset: Int,
         forward: Boolean,
     ) {
+        // Cycling a letter through its T9 group only means something for
+        // 9-key input; on a letter keyboard the user just types the letter
+        // they want, and this would have dumped them onto the 9-key grid.
+        if (!isCorrecting && rime.run { statusCached }.schemaId != T9_SCHEMA) return
         val raw = composition.preedit ?: return
         if (offset !in raw.indices) return
         val markIdx = raw.indexOf(CURSOR_MARK)
@@ -160,12 +192,21 @@ object T9CorrectionState {
         // session are already on the letter schema -- skip the reload and
         // just retype. Read before setting `pending`, which would mask it.
         val alreadyOnLetterSchema = isCorrecting
+        if (!alreadyOnLetterSchema) {
+            // Remember where to return. Reading it here (before any schema
+            // swap) is the only point where it's still the user's own schema.
+            originSchema = rime
+                .run { statusCached }
+                .schemaId
+                .takeIf { it.isNotBlank() && it != LETTER_SCHEMA }
+                ?: T9_SCHEMA
+        }
         pending = true
         active = false
         rime.launchOnReady { api ->
             api.clearComposition()
             if (!alreadyOnLetterSchema) {
-                api.selectSchema("luna_pinyin")
+                api.selectSchema(LETTER_SCHEMA)
             }
             // multi-syllable preedits carry Rime's display separator (a
             // space); retype it as the apostrophe, the typeable syllable
@@ -174,11 +215,12 @@ object T9CorrectionState {
         }
     }
 
-    private fun restoreT9Schema(rime: RimeSession) {
+    private fun restoreOriginSchema(rime: RimeSession) {
         active = false
         pending = false
+        val target = originSchema
         rime.launchOnReady { api ->
-            api.selectSchema("t9_pinyin")
+            api.selectSchema(target)
         }
     }
 }

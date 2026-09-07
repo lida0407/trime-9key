@@ -45,6 +45,17 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
 
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
+    /**
+     * trime-9key: [swipeTravel] and [swipeVelocity] are configured in dp and
+     * dp/s (that's what the settings screen shows), but were compared against
+     * raw pixel distances -- so the real threshold shrank as screen density
+     * grew (~23dp instead of 60 on a 420dpi phone) and differed on every
+     * device. Convert once here.
+     */
+    private val density = context.resources.displayMetrics.density
+    private val swipeTravelPx get() = swipeTravel * density
+    private val swipeVelocityPx get() = swipeVelocity * density
+
     var onClick: (() -> Unit)? = null
     var onDoubleClick: (() -> Unit)? = null
     var onLazyDoubleClick: (() -> Unit)? = null
@@ -141,7 +152,7 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
 
                 if ((isSlideCursor || isSlideDelete) && onSlide != null && !isLongPressed && swipeTravel > 0) {
                     if (!slideActivated) {
-                        if (abs(dx) >= swipeTravel) {
+                        if (abs(dx) >= swipeTravelPx) {
                             slideActivated = true
                             lastX = startX
                         }
@@ -307,8 +318,8 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
         }
 
         val isSwipe =
-            (swipeTravel > 0 && distance >= swipeTravel) ||
-                (swipeVelocity > 0 && velocity >= swipeVelocity)
+            (swipeTravel > 0 && distance >= swipeTravelPx) ||
+                (swipeVelocity > 0 && velocity >= swipeVelocityPx)
         swipeTriggered = isSwipe
 
         if (!isSwipe) return KeyBehavior.CLICK

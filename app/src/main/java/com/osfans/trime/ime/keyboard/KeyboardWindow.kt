@@ -208,6 +208,11 @@ class KeyboardWindow :
     }
 
     override fun onStartInput(info: EditorInfo) {
+        // trime-9key: a new input session can't inherit a half-finished
+        // letter-pick from the previous one -- the process may have been
+        // killed mid-session, which would leave the flags, the engine's
+        // schema and the visible keyboard disagreeing.
+        T9CorrectionState.reset()
         val targetKeyboard =
             when (info.imeOptions and EditorInfo.IME_FLAG_FORCE_ASCII) {
                 EditorInfo.IME_FLAG_FORCE_ASCII -> ".ascii"
@@ -289,9 +294,9 @@ class KeyboardWindow :
         // successive drag-picks (h, a, o), so the drag targets must not
         // disappear under their finger. The schema alone flips to the letter
         // schema; bare digit taps are swallowed meanwhile (see
-        // CommonKeyboardActionListener). Session end restores t9_pinyin,
-        // which passes through here normally.
-        if (T9CorrectionState.isCorrecting && schema.id != "t9_pinyin") return
+        // CommonKeyboardActionListener). Session end restores the schema the
+        // user came from, which passes through here normally.
+        if (T9CorrectionState.isCorrecting && schema.id == T9CorrectionState.letterSchemaId) return
         // Use the id carried by the event itself. smartMatchKeyboard reads
         // statusCached, which often hasn't caught up when this fires and
         // would re-match the OLD schema's layout.

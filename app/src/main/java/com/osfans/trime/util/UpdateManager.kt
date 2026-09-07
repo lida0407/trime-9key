@@ -46,6 +46,14 @@ object UpdateManager {
         val commit: String = "",
         val apkUrl: String = "",
         val notes: String = "",
+        /**
+         * Build time of the published APK, in epoch millis (see
+         * [BuildConfig.BUILD_TIMESTAMP]). Commit hashes have no ordering, so
+         * this is what tells "newer" from "older" -- without it the app
+         * happily offers, and installs, a DOWNGRADE whenever the manifest
+         * points at any build other than the installed one.
+         */
+        val buildTimestamp: Long = 0L,
     )
 
     /** Fetch the latest published release manifest, or null on any failure. */
@@ -62,11 +70,25 @@ object UpdateManager {
         }.onFailure { Timber.w(it, "Failed to fetch update manifest") }.getOrNull()
     }
 
-    /** True if [release] is a different build than the one currently installed. */
-    fun isUpdateAvailable(release: Release): Boolean =
-        release.commit.isNotBlank() &&
-            release.apkUrl.isNotBlank() &&
-            !release.commit.equals(BuildConfig.BUILD_COMMIT_HASH, ignoreCase = true)
+    /**
+     * True if [release] is strictly NEWER than the installed build.
+     *
+     * Deliberately not "the hashes differ": that offered a downgrade any time
+     * the manifest lagged the installed build, and one tap on the dialog then
+     * silently rolled the user back to an older APK.
+     */
+    fun isUpdateAvailable(release: Release): Boolean {
+        if (release.commit.isBlank() || release.apkUrl.isBlank()) return false
+        if (release.commit.equals(BuildConfig.BUILD_COMMIT_HASH, ignoreCase = true)) return false
+        if (release.buildTimestamp <= 0L) {
+            // A manifest without a build time can't be ordered against this
+            // build; refusing is the safe answer (worst case: no update
+            // prompt), offering it is how downgrades happened.
+            Timber.w("Update manifest has no buildTimestamp; ignoring it")
+            return false
+        }
+        return release.buildTimestamp > BuildConfig.BUILD_TIMESTAMP
+    }
 
     /** Download [url] into [dest]; returns true on success. */
     suspend fun download(url: String, dest: File): Boolean = withContext(Dispatchers.IO) {
@@ -103,6 +125,39 @@ object UpdateManager {
             Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         )
     }
+
+    private const val PREFS = "trime9key_update"
+    private const val KEY_SKIPPED_COMMIT = "skipped_commit"
+    private const val KEY_AUTO_CHECK = "auto_check"
+
+    /** Whether the launch-time check may prompt at all. */
+    fun isAutoCheckEnabled(context: Context): Boolean =
+        context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AUTO_CHECK, true)
+
+    fun setAutoCheckEnabled(context: Context, enabled: Boolean) {
+        context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AUTO_CHECK, enabled)
+            .apply()
+    }
+
+    /** Remember that the user doesn't want to be asked about [commit] again. */
+    fun skipVersion(context: Context, commit: String) {
+        context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_SKIPPED_COMMIT, commit)
+            .apply()
+    }
+
+    fun isSkipped(context: Context, commit: String): Boolean =
+        context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_SKIPPED_COMMIT, null)
+            ?.equals(commit, ignoreCase = true) == true
 }
 
 /**
@@ -113,6 +168,7 @@ object UpdateManager {
  *   updates"), also report "up to date" / failure so the tap gives feedback.
  */
 fun FragmentActivity.checkForUpdate(silent: Boolean = true) {
+    if (silent && !UpdateManager.isAutoCheckEnabled(this)) return
     lifecycleScope.launch {
         val release = UpdateManager.fetchLatest()
         if (release == null) {
@@ -123,6 +179,10 @@ fun FragmentActivity.checkForUpdate(silent: Boolean = true) {
             if (!silent) toast(R.string.update__already_latest)
             return@launch
         }
+        // The automatic check used to re-open this blocking dialog on EVERY
+        // launch until the user updated. Honour "skip this version" for it;
+        // an explicit "check for updates" tap still always answers.
+        if (silent && UpdateManager.isSkipped(this@checkForUpdate, release.commit)) return@launch
         if (isFinishing || isDestroyed) return@launch
         AlertDialog
             .Builder(this@checkForUpdate)
@@ -136,10 +196,13 @@ fun FragmentActivity.checkForUpdate(silent: Boolean = true) {
                 ),
             ).setPositiveButton(R.string.update__download) { _, _ ->
                 downloadAndInstall(release)
-            }.setNeutralButton(R.string.update__open_browser) { _, _ ->
-                UpdateManager.openInBrowser(this@checkForUpdate, release.apkUrl)
-            }.setNegativeButton(android.R.string.cancel, null)
-            .show()
+            }.setNeutralButton(R.string.update__later, null)
+            // "Skip" replaces the old browser link: downloadAndInstall already
+            // falls back to the browser on failure, whereas there was no way
+            // at all to stop the dialog coming back every launch.
+            .setNegativeButton(R.string.update__skip_version) { _, _ ->
+                UpdateManager.skipVersion(this@checkForUpdate, release.commit)
+            }.show()
     }
 }
 
