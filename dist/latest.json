@@ -1,7 +1,7 @@
 {
-  "versionName": "v3.3.11-51-g522be83b",
-  "commit": "522be83bd6f3b6f2a0c67d4431a16ded62ca2900",
-  "buildTimestamp": 1788769055895,
+  "versionName": "v3.3.11-53-g790f565b",
+  "commit": "790f565b19a74b790dfdfbc985b156d23c453e45",
+  "buildTimestamp": 1788857220022,
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "一个键切换模式：九宫格 → 全键拼音 → 英文；设置大幅精简。\n\n· 以前有三套互相打架的切换：「中文/西文」开关（能把九宫格切成英文，没有意义）、「全键/九宫格」键、还有长按 Shift 切英文。现在只有一个键，按一下循环：九宫格 → 全键拼音 → 英文 → 九宫格，键上写的永远是「按下去会切到哪个模式」。Shift 只管大小写，不再碰中英文。九宫格上空出来的位置改成了数字键盘。\n· 「虚拟键盘」设置从一长串 36 项精简到 8 项，分成「布局 / 反馈 / 手势」三组。去掉的都是对手机九宫格没意义或重复的：外接键盘 Ctrl/Shift 钩子、按键朗读、滑动速度（和滑动距离重复）、双击/连发/滑步等时间参数、横屏分栏、软光标、自定义音效文件、抬起/连发震动变体、候选列数。它们仍按默认值生效。\n\nOne mode key now cycles 9-key -> qwerty pinyin -> English (label names the next mode); Shift/Caps no longer toggle English. Virtual Keyboard settings trimmed from 36 items to 8 in three groups; removed items keep their defaults."
+  "notes": "模式键改为显示当前模式：九宫格 / 中文 / 英文。\n\n· 上一版键上写的是「按下去会切到哪」，英文状态下显示「九宫格」容易误解。现在和主流输入法一致，键上就是当前模式：九宫格中文 →（全键）中文 → 英文，循环。\n\n一个键切换模式：九宫格 → 全键拼音 → 英文；设置大幅精简。\n\n· 以前有三套互相打架的切换：「中文/西文」开关（能把九宫格切成英文，没有意义）、「全键/九宫格」键、还有长按 Shift 切英文。现在只有一个键，按一下循环：九宫格 → 全键拼音 → 英文 → 九宫格，键上写的永远是「按下去会切到哪个模式」。Shift 只管大小写，不再碰中英文。九宫格上空出来的位置改成了数字键盘。\n· 「虚拟键盘」设置从一长串 36 项精简到 8 项，分成「布局 / 反馈 / 手势」三组。去掉的都是对手机九宫格没意义或重复的：外接键盘 Ctrl/Shift 钩子、按键朗读、滑动速度（和滑动距离重复）、双击/连发/滑步等时间参数、横屏分栏、软光标、自定义音效文件、抬起/连发震动变体、候选列数。它们仍按默认值生效。\n\nOne mode key now cycles 9-key -> qwerty pinyin -> English (label names the next mode); Shift/Caps no longer toggle English. Virtual Keyboard settings trimmed from 36 items to 8 in three groups; removed items keep their defaults."
 }
