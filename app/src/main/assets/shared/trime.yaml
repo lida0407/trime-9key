@@ -926,12 +926,12 @@ preset_keys:
   # （见 KeyboardWindow.smartMatchKeyboard：布局 id 等于方案 id 时自动选用）。
   switch_to_t9: {label: 九宫格, send: function, command: select_schema, option: t9_pinyin}
   switch_to_qwerty: {label: 全键, send: function, command: select_schema, option: luna_pinyin}
-  # trime-9key: the single mode key. Cycles 九宫格 -> 全键拼音 -> 英文 -> 九宫格
+  # trime-9key: the single mode key. Cycles 九宫格中文 -> 全键中文 -> 英文 -> ...
   # (see CommonKeyboardActionListener "cycle_input_mode"). The label names the
-  # mode you'll switch TO. On the qwerty grid it follows ascii_mode: pinyin
-  # shows 英文 (next), english shows 九宫格 (next).
-  cycle_mode_t9: {label: 全键, send: function, command: cycle_input_mode}
-  cycle_mode_qwerty: {toggle: ascii_mode, states: [英文, 九宫格], send: function, command: cycle_input_mode}
+  # CURRENT mode, like every mainstream IME. On the qwerty grid it follows
+  # ascii_mode: 中文 while composing pinyin, 英文 in ASCII mode.
+  cycle_mode_t9: {label: 九宫格, send: function, command: cycle_input_mode}
+  cycle_mode_qwerty: {toggle: ascii_mode, states: [中文, 英文], send: function, command: cycle_input_mode}
   # trime-9key：九宫格精确选字母。在数字键上按住/滑动选出该键上的具体字母
   # （如 GHI 键：左滑=g、长按原地松手=h、右滑=i），用于重码消歧（hao→gao）。
   # 处理逻辑见 CommonKeyboardActionListener 的 t9_pick_letter 命令。
