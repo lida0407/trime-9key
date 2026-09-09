@@ -39,10 +39,14 @@ switches:
   - name: emoji            # 输入词语时附带 emoji 候选（如 哈哈 → 😄）
     states: [ 无表情, 表情 ]
     reset: 1
+  - name: prediction       # 上屏后预测下一个字（见文件末尾 predictor）
+    states: [ 无联想, 联想 ]
+    reset: 1
 
 engine:
   processors:
     - ascii_composer
+    - predictor          # 必须在 key_binder 之前
     - recognizer
     - key_binder
     - speller
@@ -57,6 +61,7 @@ engine:
     - punct_segmentor
     - fallback_segmentor
   translators:
+    - predict_translator
     - punct_translator
     - reverse_lookup_translator
     - script_translator
@@ -120,3 +125,15 @@ recognizer:
   import_preset: default
   patterns:
     reverse_lookup: "`[a-z]*'?$"
+
+# trime-9key: 上屏一个词之后，直接给出接下来最可能的字（联想/预测）。
+# 模型是官方 librime-predict 的语料模型（rime/librime-predict 的
+# data-1.0 发布），原版是繁体，已用 OpenCC 转成简体——否则打简体却
+# 联想出「這/國/說」。九宫格上这个功能省的键数最多：一次点选代替
+# 三四次按键。
+predictor:
+  db: predict.db
+  # 与 menu/page_size 一致，免得联想候选把翻页挤掉
+  max_candidates: 5
+  # 只联想一轮：连续联想会一直霸占候选栏，打断正常输入
+  max_iterations: 1
