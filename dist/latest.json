@@ -1,7 +1,7 @@
 {
-  "versionName": "v3.3.11-53-g790f565b",
-  "commit": "790f565b19a74b790dfdfbc985b156d23c453e45",
-  "buildTimestamp": 1788857220022,
+  "versionName": "v3.3.11-57-g99aafcfe",
+  "commit": "f9ef7fde98301516cdc6aba37e7b3e729ded02bc",
+  "buildTimestamp": 1788981300650,
   "apkUrl": "https://raw.githubusercontent.com/lida0407/trime-9key/develop/dist/trime-9key-debug-arm64-v8a.apk",
-  "notes": "模式键改为显示当前模式：九宫格 / 中文 / 英文。\n\n· 上一版键上写的是「按下去会切到哪」，英文状态下显示「九宫格」容易误解。现在和主流输入法一致，键上就是当前模式：九宫格中文 →（全键）中文 → 英文，循环。\n\n一个键切换模式：九宫格 → 全键拼音 → 英文；设置大幅精简。\n\n· 以前有三套互相打架的切换：「中文/西文」开关（能把九宫格切成英文，没有意义）、「全键/九宫格」键、还有长按 Shift 切英文。现在只有一个键，按一下循环：九宫格 → 全键拼音 → 英文 → 九宫格，键上写的永远是「按下去会切到哪个模式」。Shift 只管大小写，不再碰中英文。九宫格上空出来的位置改成了数字键盘。\n· 「虚拟键盘」设置从一长串 36 项精简到 8 项，分成「布局 / 反馈 / 手势」三组。去掉的都是对手机九宫格没意义或重复的：外接键盘 Ctrl/Shift 钩子、按键朗读、滑动速度（和滑动距离重复）、双击/连发/滑步等时间参数、横屏分栏、软光标、自定义音效文件、抬起/连发震动变体、候选列数。它们仍按默认值生效。\n\nOne mode key now cycles 9-key -> qwerty pinyin -> English (label names the next mode); Shift/Caps no longer toggle English. Virtual Keyboard settings trimmed from 36 items to 8 in three groups; removed items keep their defaults."
+  "notes": "新增联想：上屏一个字词后，直接给出下一个最可能的字。\n\n· 例如打完「你」，候选栏直接给出「的 / 不 / 是 / 说 / 会」，点一下就是「你的」——原本要按三下键。九宫格上这个功能省的按键最多。\n· 模型用的是 librime-predict 官方语料模型，但官方版是繁体，打简体会联想出「這/國/說」。已用项目里自带的 OpenCC 表转成简体，繁转简合并的字按最高词频取。\n· 模型做了精简：去掉权重过低的长尾、每个键最多留 5 条（联想栏本来也只显示 5 条），保留了原模型 99.75% 的预测权重，体积从 7.2MB 降到 4.0MB，安装包只增加 2.6MB。\n· 联想按 2-3 个字的上下文，而不是只看最后一个字。\n· 顺带修掉：emoji 会挤进联想栏（打完「你」时 🙅 占掉两个位置，把「的/不/是」挤下去）。现在 emoji 只在正常打字时出现。\n· 目前只在九宫格生效；全键拼音方案来自 Rime 官方预置，需要另一种打补丁的方式，后续再加。\n\nNext-word prediction: after committing a word the keyboard offers the most likely following characters (你 -> 的/不/是/说/会), turning three keystrokes into one tap. The official librime-predict model was converted from traditional to simplified and trimmed to 4.0 MB (+2.6 MB APK) while keeping 99.75% of its predictive weight. Emoji no longer displace predictions."
 }
