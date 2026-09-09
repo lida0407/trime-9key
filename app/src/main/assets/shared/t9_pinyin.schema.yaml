@@ -107,6 +107,10 @@ emoji:
   option_name: emoji
   opencc_config: emoji.json
   inherit_comment: false
+  # 只在正常打字时给 emoji 候选。联想（prediction）的候选栏只有 5 个位置，
+  # 让 emoji 挤进去会顶掉真正的联想字（实测打「你」后 🙅 占了两个位置，
+  # 把「的/不/是」挤下去）。predict_engine 给联想片段打的 tag 是 prediction。
+  tags: [ abc ]
 
 reverse_lookup:
   dictionary: stroke
