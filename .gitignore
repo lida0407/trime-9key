@@ -476,6 +476,8 @@ app/src/main/assets/shared/opencc
 
 # boost
 app/boost-*.tar.xz
+# the archive actually lands next to the CMake that fetches it
+app/src/main/jni/boost-*.tar.xz
 app/src/main/jni/boost/
 
 # kotlin
